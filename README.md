@@ -7,7 +7,7 @@
 [![Allure TestOps](https://img.shields.io/badge/Allure-violet?logo=allure)](https://docs.qameta.io/allure-testops/)
 
 # LumaireJ 🤍✨
-#### A journaling app for emotional self-awareness and reflection (_by Darli Ro_)
+#### A journaling app for emotional self-awareness and reflection
 
 ---
 
