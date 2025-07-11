@@ -1,14 +1,16 @@
 [project]
 name = "LumaireJ"
 version = "0.1.0"
-description = "Default template for PDM package"
+description = "A journaling app for emotional self-awareness and reflection"
 authors = [
     {name = "Darli Ro", email = "glicerinn@gmail.com"},
 ]
-dependencies = []
+dependencies = ["fastapi>=0.116.0", "uvicorn>=0.35.0"]
 requires-python = "==3.13.*"
 readme = "README.md"
 
-
 [tool.pdm]
 distribution = false
+
+[tool.pdm.scripts]
+dev = "uvicorn app.main:app --reload"
