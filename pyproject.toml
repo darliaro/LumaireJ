@@ -5,7 +5,7 @@ description = "A journaling app for emotional self-awareness and reflection"
 authors = [
     {name = "Darli Ro", email = "glicerinn@gmail.com"},
 ]
-dependencies = ["fastapi>=0.116.0", "uvicorn>=0.35.0"]
+dependencies = ["fastapi>=0.116.0", "uvicorn>=0.35.0", "pydantic-settings>=2.10.1", "python-dotenv>=1.1.1"]
 requires-python = "==3.13.*"
 readme = "README.md"
 
