@@ -8,12 +8,12 @@ assignees: []
 
 ## Description
 
-Briefly describe the bug.
+Describe the issue clearly and concisely.
 
 ## Expected vs Actual Behavior
 
-- Expected:
-- Actual:
+- **Expected:**  
+- **Actual:**  
 
 ## Steps to Reproduce
 
@@ -27,13 +27,19 @@ Briefly describe the bug.
 
 ## Environment
 
-- Browser / OS / Device:
-- Branch / Version:
+- OS/Browser/Device:
+- App Version / Branch:
 
 ## QA Notes
 
-Was it tested elsewhere? Does it block other work?
+Include any re-test steps or evidence of fix validation.
 
-## Notes
+## Definition of Done (DoD)
 
-Any context, spec references, or known related issues?
+- [ ] Bug confirmed as fixed
+- [ ] Regression tested
+- [ ] Closed after QA validation
+
+## Artifacts
+
+- Error logs, screenshots, commit hash, test case link

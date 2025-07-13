@@ -2,34 +2,43 @@
 name: Architecture Task
 about: Set up or modify architectural or infrastructure components
 title: "[ARCH] "
-labels: ["area:architecture", "type:infra"]
+labels: ["type:infra", "area:architecture"]
 assignees: []
 ---
 
 ## Summary
 
-Briefly describe what should be implemented and why.
+Describe the purpose of the architectural task and its impact on the system structure.
+
+## Ready to Start (DoR)
+
+- [ ] Tech context is clear
+- [ ] No unresolved dependencies
+- [ ] Scope of work is well-defined
 
 ## Goal
 
-- [ ] What should be created/changed?
-- [ ] Why is it needed?
+- [ ] List key changes or integrations planned
 
-## Acceptance Criteria
+## Acceptance Criteria (AC)
 
 | ID | Description | Result |
 |----|-------------|--------|
 | AC-1 |  |  |
 | AC-2 |  |  |
 
-## QA Notes (if applicable)
+## QA Notes
 
-Add manual validation notes or mention if N/A.
+Document manual test results and validation steps.
+
+## Definition of Done (DoD)
+
+- [ ] All ACs validated
+- [ ] Code committed and/or PR created
+- [ ] Manual tests done
+- [ ] QA Notes written
+- [ ] Task closed
 
 ## Artifacts
 
-Add relevant links (e.g. PR, commit, file changes).
-
-## Notes
-
-Anything else worth documenting.
+- PRs, commits, test logs, screenshots
