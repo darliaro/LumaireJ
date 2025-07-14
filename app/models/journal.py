@@ -19,6 +19,5 @@ class JournalEntry(SQLModel, table=True):
     )
     mood: str | None = Field(description="Optional mood tag")
     user_id: int | None = Field(
-        foreign_key="user.id",
         description="Reference to the user who owns the entry",
     )
