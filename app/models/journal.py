@@ -18,6 +18,3 @@ class JournalEntry(SQLModel, table=True):
         description="Timestamp of entry creation in UTC",
     )
     mood: str | None = Field(description="Optional mood tag")
-    user_id: int | None = Field(
-        description="Reference to the user who owns the entry",
-    )
