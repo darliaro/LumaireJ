@@ -1,5 +1,6 @@
 from datetime import datetime
-from pydantic import BaseModel, Field, ConfigDict, constr, PositiveInt
+
+from pydantic import BaseModel, ConfigDict, Field, PositiveInt, constr
 
 
 class JournalCreate(BaseModel):

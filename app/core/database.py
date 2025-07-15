@@ -1,6 +1,7 @@
 from sqlmodel import SQLModel, create_engine
-from app.core.config import settings
+
 from app import models  # noqa: F401
+from app.core.config import settings
 
 engine = create_engine(settings.database_url, echo=settings.debug)
 

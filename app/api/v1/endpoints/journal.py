@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, status
 from sqlmodel import Session
 
@@ -26,7 +28,7 @@ def get_session() -> Session:
 )
 def create_journal_entry(
     payload: JournalCreate,
-    session: Session = Depends(get_session),
+    session: Annotated[Session, Depends(get_session)],
 ) -> JournalRead:
     """Create a new journal entry"""
     entry = JournalEntry(**payload.model_dump())

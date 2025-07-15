@@ -1,6 +1,7 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
 from urllib.parse import urlparse
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):

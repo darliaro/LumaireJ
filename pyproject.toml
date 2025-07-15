@@ -14,3 +14,35 @@ distribution = false
 
 [tool.pdm.scripts]
 dev = "uvicorn app.main:app --reload"
+lint = "ruff check ."
+format = "ruff format ."
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+indent-width = 4
+exclude = ["__pypackages__", ".venv", "migrations"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "SIM",  # flake8-simplify
+]
+ignore = [
+    "E501",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+[dependency-groups]
+dev = [
+    "pre-commit>=4.2.0",
+]

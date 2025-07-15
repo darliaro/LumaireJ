@@ -1,7 +1,8 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
-from app.api.v1.endpoints import journal
 
+from fastapi import FastAPI
+
+from app.api.v1.endpoints import journal
 from app.core.config import settings
 from app.core.database import init_db
 
