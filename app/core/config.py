@@ -1,4 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pathlib import Path
+from urllib.parse import urlparse
 
 
 class Settings(BaseSettings):
@@ -9,3 +11,6 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+db_path = urlparse(settings.database_url).path
+print(f"[DEBUG] Using database at: {Path(db_path).resolve()}")

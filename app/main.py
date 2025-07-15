@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from app.api.v1.endpoints import journal
 
 from app.core.config import settings
 from app.core.database import init_db
@@ -22,8 +23,10 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.include_router(journal.router)
+
 
 @app.get("/health")
 def health_check() -> dict:
-    """Basic heartbeat endpoint."""
+    """Basic heartbeat endpoint"""
     return {"status": "healthy", "version": app.version}
