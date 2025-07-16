@@ -6,13 +6,13 @@ from pydantic import BaseModel, ConfigDict, Field, PositiveInt, constr
 class JournalCreate(BaseModel):
     content: constr(strip_whitespace=True, min_length=1, max_length=5000) = Field(
         ...,
-        description="Main textual content written by the user",
+        description="Main textual content",
         example="Today I felt surprisingly calm and reflective",
     )
     mood: str | None = Field(
         default=None,
         max_length=50,
-        description="Optional mood tag",
+        description="Mood tag",
     )
 
     model_config = ConfigDict(str_strip_whitespace=True)
@@ -21,19 +21,19 @@ class JournalCreate(BaseModel):
 class JournalRead(BaseModel):
     id: PositiveInt = Field(
         ...,
-        description="Unique identifier of the journal entry",
+        description="ID of the journal entry",
     )
     content: str = Field(
         ...,
-        description="Main textual content written by the user",
+        description="Main textual content",
     )
     created_at: datetime = Field(
         ...,
-        description="Timestamp of entry creation, stored in UTC",
+        description="Timestamp of entry creation in UTC",
     )
     mood: str | None = Field(
         default=None,
-        description="Optional mood tag",
+        description="Mood tag",
     )
 
     model_config = ConfigDict(from_attributes=True)
