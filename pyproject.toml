@@ -16,7 +16,6 @@ distribution = false
 dev = "uvicorn app.main:app --reload"
 lint = "ruff check ."
 format = "ruff format ."
-typecheck = "mypy app"
 test = "pytest --cov=app --cov-report=term-missing"
 
 [tool.pytest.ini_options]
