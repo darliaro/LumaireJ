@@ -15,6 +15,8 @@ jobs:
 
       - name: Setup PDM
         uses: pdm-project/setup-pdm@v4
+        with:
+          python-version: '3.13'
 
       - name: Install dependencies
         run: pdm install
@@ -22,8 +24,8 @@ jobs:
       - name: Run Linter
         run: pdm run lint && pdm run format
 
-      - name: Run Type-checks
-        run: pdm run type-check
+      - name: Run Typechecks
+        run: pdm run typecheck
 
       - name: Run Tests
         run: pdm run test
