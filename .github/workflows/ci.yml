@@ -17,14 +17,17 @@ jobs:
         uses: pdm-project/setup-pdm@v4
         with:
           python-version: '3.13'
-          pdm-version: '4.4'
+          version: '4.4'
           cache: true
 
       - name: Install dependencies
         run: pdm install
 
-      - name: Run Linter
+      - name: Run Linter with Formatting
         run: pdm run lint && pdm run format
 
-      - name: Run Tests
+      - name: Run Type Checks
+        run: pdm run type-check
+
+      - name: Run Tests with Coverage
         run: pdm run test
