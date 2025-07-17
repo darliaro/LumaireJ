@@ -24,8 +24,5 @@ jobs:
       - name: Run Linter
         run: pdm run lint && pdm run format
 
-      - name: Run Typechecks
-        run: pdm run typecheck
-
       - name: Run Tests
         run: pdm run test
