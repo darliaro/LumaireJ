@@ -16,6 +16,7 @@ distribution = false
 dev = "uvicorn app.main:app --reload"
 lint = "ruff check ."
 format = "ruff format ."
+test = "pytest"
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
