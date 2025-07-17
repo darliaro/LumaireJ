@@ -7,6 +7,7 @@ from app.schemas import JournalCreate
 
 # --- CRUD Layer Tests --- #
 
+
 def test_create_journal_entry_with_valid_data(test_session: Session):
     """Test that a valid journal entry is successfully created and persisted."""
 
@@ -20,6 +21,7 @@ def test_create_journal_entry_with_valid_data(test_session: Session):
 
 
 # --- Schema Validation Tests --- #
+
 
 def test_journal_create_with_empty_content_raises_validation_error():
     """Test that verifies that creating a JournalCreate object with empty content raises a ValidationError."""
