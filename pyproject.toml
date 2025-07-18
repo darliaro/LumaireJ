@@ -13,7 +13,7 @@ readme = "README.md"
 distribution = false
 
 [tool.pdm.scripts]
-dev = "uvicorn app.main:app --reload"
+dev = "uvicorn app.main:app --reload --host 0.0.0.0"
 lint = "ruff check ."
 format = "ruff format ."
 test = "pytest --cov=app --cov-report=term-missing"
