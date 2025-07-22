@@ -1,12 +1,12 @@
-name: PR Lint & Test
+name: PR Lint & Unit Tests
 
 on:
   pull_request:
     branches: [main]
 
 jobs:
-  test:
-    name: Run Linter and Tests
+  lint-and-unit-tests:
+    name: Lint & Unit Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -24,5 +24,24 @@ jobs:
       - name: Run Linter
         run: pdm run lint && pdm run format
 
-      - name: Run Tests
+      - name: Run Unit Tests
         run: pdm run test
+
+  trigger-integration-tests:
+    name: Run API & E2E Tests (external)
+    needs: lint-and-unit-tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Dispatch repository event to LumaireJ-tests
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.PAT_FOR_TESTS_REPO }}
+          repository: ${{ github.repository_owner }}/LumaireJ-tests
+          event-type: run-tests
+          client-payload: |
+            {
+              "ref": "${{ github.ref }}",
+              "sha": "${{ github.sha }}",
+              "pr_number": "${{ github.event.pull_request.number }}"
+            }
