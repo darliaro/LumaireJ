@@ -4,19 +4,25 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: lint-unit-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint-and-unit-tests:
     name: Lint & Unit Tests
     runs-on: ubuntu-latest
-    concurrency:
-      group: lint-unit-${{ github.ref }}
-      cancel-in-progress: true
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Cache PDM & venv
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@v4
+        with:
+          python-version: '3.13'
+
+      - name: Cache PDM cache & venv
         uses: actions/cache@v4
         with:
           key: pdm-${{ runner.os }}-${{ hashFiles('pdm.lock') }}
@@ -25,36 +31,33 @@ jobs:
             ~/.cache/pdm
             .venv
 
-      - name: Setup PDM
-        uses: pdm-project/setup-pdm@v4
-        with:
-          python-version: '3.13'
+      - name: Install deps
+        run: pdm install
 
-      - name: Install dependencies
-        run: |
-          pdm install
-
-      - name: Run Linter
+      - name: Run lint & format
         run: |
           pdm run lint
           pdm run format
 
-      - name: Run Unit Tests
-        run: |
-          pdm run test
+      - name: Run unit tests
+        run: pdm run test
 
   trigger-integration-tests:
     name: Dispatch API & E2E Tests
-    needs: lint-and-unit-tests
     runs-on: ubuntu-latest
+    needs: lint-and-unit-tests
+
     if: ${{ needs.lint-and-unit-tests.result == 'success' }}
+    env:
+      PAT: ${{ secrets.PAT_FOR_TESTS_REPO }}
+      REPO: ${{ github.repository_owner }}
 
     steps:
       - name: Dispatch to test repo
         uses: peter-evans/repository-dispatch@v3
         with:
-          token: ${{ secrets.PAT_FOR_TESTS_REPO }}
-          repository: ${{ github.repository_owner }}/LumaireJ-tests
+          token: ${{ env.PAT }}
+          repository: ${{ env.REPO }}/LumaireJ-tests
           event-type: run-tests
           client-payload: |
             {
