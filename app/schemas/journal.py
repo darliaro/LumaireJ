@@ -9,9 +9,8 @@ class JournalCreate(BaseModel):
         description="Main textual content",
         example="Today I felt surprisingly calm and reflective",
     )
-    mood: str | None = Field(
+    mood: constr(strip_whitespace=True, max_length=50) | None = Field(
         default=None,
-        max_length=50,
         description="Mood tag",
     )
 
