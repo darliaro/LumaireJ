@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Journal Entry</title>
+</head>
+<body>
+    <h1>New Journal Entry</h1>
+    <form id="journal-form">
+        <label for="content">Content:</label><br>
+        <textarea id="content" name="content" rows="8" cols="40" required></textarea><br><br>
+
+        <label for="mood">Mood:</label><br>
+        <input id="mood" type="text" name="mood" maxlength="50"><br><br>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="response" style="margin-top: 1em;"></div>
+
+    <script>
+        document.getElementById('journal-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const content = e.target.content.value.trim();
+            const mood = e.target.mood.value.trim();
+
+            const payload = { content };
+            if (mood) payload.mood = mood;
+
+            const response = await fetch('/api/v1/journal', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = document.getElementById('response');
+            if (response.ok) {
+                const data = await response.json();
+                result.style.color = 'green';
+                result.textContent = 'Entry created! ID: ' + data.id;
+                e.target.reset();
+            } else {
+                const errorText = await response.text();
+                result.style.color = 'red';
+                result.textContent = 'Error ' + response.status + ': ' + errorText;
+            }
+        });
+    </script>
+</body>
+</html>
