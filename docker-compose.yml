@@ -1,6 +1,6 @@
 services:
   app:
-    build: .
+    build: ./app
     container_name: lumairej_app
     env_file: [ .env ]
     ports:
