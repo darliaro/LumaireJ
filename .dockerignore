@@ -2,7 +2,6 @@
 **
 
 # Unignore essential files and directories
-
 # Dockerfile and manifests
 !Dockerfile
 !docker-compose.yml
@@ -16,8 +15,8 @@
 # Migrations or scripts
 !migrations/**
 
-# Documentation
-!docs/**
+# Tests
+!tests/**
 
 # CI/CD and helper scripts
 !ci/**

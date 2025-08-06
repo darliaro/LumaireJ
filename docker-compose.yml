@@ -1,12 +1,20 @@
 services:
   app:
-    build: ./app
     container_name: lumairej_app
-    env_file: [ .env ]
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    env_file:
+      - .env
+
     ports:
       - "8000:8000"
+
     volumes:
-      - .:/app:delegated
+      - ./app:/app/app:delegated
       - pdm_cache:/app/__pypackages__
+
 volumes:
   pdm_cache:
