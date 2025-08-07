@@ -1,0 +1,25 @@
+{
+  "family": "lumairej-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::382467720155:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "lumairej-app",
+      "image": "382467720155.dkr.ecr.ap-southeast-2.amazonaws.com/lumairej:latest",
+      "essential": true,
+      "portMappings": [
+        { "containerPort": 8000, "protocol": "tcp" }
+      ],
+      "environment": [
+        {
+          "name": "DATABASE_URL",
+          "value": "postgresql://lumairej_user:${DB_PASSWORD}@lumairej-db.c1qe66eys4ze.ap-southeast-2.rds.amazonaws.com:5432/lumairej_prod"
+        },
+        { "name": "DEBUG", "value": "False" }
+      ]
+    }
+  ]
+}
