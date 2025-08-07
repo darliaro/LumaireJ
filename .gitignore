@@ -14,6 +14,9 @@ ENV/
 env.bak/
 venv.bak/
 
+# === AWS ECS task definition ===
+task-def.json
+
 # === PyInstaller ===
 *.spec
 *.manifest
