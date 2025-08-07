@@ -1,0 +1,25 @@
+# Ignore everything
+**
+
+# Unignore essential files and directories
+# Dockerfile and manifests
+!Dockerfile
+!docker-compose.yml
+!pyproject.toml
+!pdm.lock
+!README.md
+
+# Application source code
+!app/**
+
+# Migrations or scripts
+!migrations/**
+
+# Tests
+!tests/**
+
+# CI/CD and helper scripts
+!ci/**
+
+# Static assets
+!static/**

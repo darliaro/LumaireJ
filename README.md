@@ -47,15 +47,18 @@
 
 ---
 
-## Running the App Locally
-Start the FastAPI server with:
+## DB Migrations
+- [ ] Populate `.env` with the correct connection string:
+  ```bash
+  echo "DATABASE_URL=postgresql://<USER>:<PASS>@<HOST>:5432/<DB_NAME>" >> .env
 
-```bash
-pdm run uvicorn app.main:app --reload
-```
+- [ ] Generate a new migration revision:
+  ```bash
+  pdm run alembic -c pyproject.toml revision --autogenerate -m "Initial migration"
 
-Then open your browser at:  
-[http://127.0.0.1:8000](http://127.0.0.1:8000)
+- [ ] Apply all pending migrations:
+  ```bash
+  pdm run alembic -c pyproject.toml upgrade head
 
 ---
 
