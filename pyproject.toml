@@ -17,6 +17,8 @@ dev = "uvicorn app.main:app --reload"
 lint = "ruff check ."
 format = "ruff format ."
 test = "pytest --cov=app --cov-report=term-missing"
+dbrevision = "alembic -c pyproject.toml revision --autogenerate"
+dbupgrade  = "alembic -c pyproject.toml upgrade head"
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
@@ -50,8 +52,14 @@ indent-style = "space"
 line-ending = "lf"
 [dependency-groups]
 dev = [
+    "alembic>=1.16.4",
     "pre-commit>=4.2.0",
     "pytest>=8.4.1",
     "pytest-cov>=6.2.1",
     "ruff>=0.12.3",
 ]
+
+[tool.alembic]
+script_location = "alembic"
+path_separator = "os"
+prepend_sys_path = ["."]
