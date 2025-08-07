@@ -2,19 +2,25 @@ services:
   app:
     container_name: lumairej_app
 
+    # Build settings: context and Dockerfile to use
     build:
       context: .
       dockerfile: Dockerfile
 
+    # Environment variables file
     env_file:
       - .env
 
+    # Ports mapping: host:container
     ports:
       - "8000:8000"
 
+    # Mount source code and cache as volumes
     volumes:
-      - ./app:/app/app:delegated
-      - pdm_cache:/app/__pypackages__
+      - ./app:/app/app:delegated  # mount app code for live reload
+      - pdm_cache:/app/__pypackages__  # cache PDM packages
 
+# Named volume for PDM cache
 volumes:
   pdm_cache:
+    driver: local
