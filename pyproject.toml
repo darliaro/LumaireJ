@@ -5,9 +5,17 @@ description = "A journaling app for emotional self-awareness and reflection"
 authors = [
     {name = "Darli Ro", email = "glicerinn@gmail.com"},
 ]
-dependencies = ["fastapi>=0.116.0", "uvicorn>=0.35.0", "pydantic-settings>=2.10.1", "python-dotenv>=1.1.1", "sqlmodel>=0.0.24"]
 requires-python = "==3.13.*"
 readme = "README.md"
+
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pydantic-settings",
+    "python-dotenv",
+    "sqlmodel",
+    "psycopg[binary]"
+]
 
 [tool.pdm]
 distribution = false
@@ -20,6 +28,15 @@ test = "pytest --cov=app --cov-report=term-missing"
 dbrevision = "alembic -c pyproject.toml revision --autogenerate"
 dbupgrade  = "alembic -c pyproject.toml upgrade head"
 
+[dependency-groups]
+dev = [
+    "alembic",
+    "pre-commit",
+    "pytest",
+    "pytest-cov",
+    "ruff",
+]
+
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
@@ -29,35 +46,18 @@ addopts = "-ra -q"
 target-version = "py313"
 line-length = 100
 indent-width = 4
-exclude = ["__pypackages__", ".venv", "migrations"]
+exclude = ["__pypackages__", ".venv", "alembic/versions"]
 
 [tool.ruff.lint]
 select = [
-    "E",    # pycodestyle errors
-    "F",    # pyflakes
-    "I",    # isort
-    "N",    # pep8-naming
-    "UP",   # pyupgrade
-    "B",    # flake8-bugbear
-    "C4",   # flake8-comprehensions
-    "SIM",  # flake8-simplify
+    "E","F","I","N","UP","B","C4","SIM",
 ]
-ignore = [
-    "E501",
-]
+ignore = ["E501"]
 
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
 line-ending = "lf"
-[dependency-groups]
-dev = [
-    "alembic>=1.16.4",
-    "pre-commit>=4.2.0",
-    "pytest>=8.4.1",
-    "pytest-cov>=6.2.1",
-    "ruff>=0.12.3",
-]
 
 [tool.alembic]
 script_location = "alembic"
