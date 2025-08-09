@@ -8,12 +8,13 @@
 !pyproject.toml
 !pdm.lock
 !README.md
+!requirements.txt
 
 # Application source code
 !app/**
 
 # Migrations or scripts
-!migrations/**
+!alembic/**
 
 # Tests
 !tests/**
