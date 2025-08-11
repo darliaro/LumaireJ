@@ -1,0 +1,56 @@
+name: Manual Deploy to ECS
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  id-token: write  # Needed for GitHub OIDC → AssumeRole in AWS
+  contents: read   # Allows checkout to read the repo
+
+concurrency:
+  group: ecs-manual-deploy-prod  # Only one concurrent run per branch; cancel any in-progress run when a new one starts
+  cancel-in-progress: true
+
+env:
+  AWS_REGION: ap-southeast-2
+  ACCOUNT_ID: 382467720155
+  ECR_REPO: lumairej-api
+  ECS_CLUSTER: lumairej-cluster
+  ECS_SERVICE: lumairej-service
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build & push :latest
+        uses: docker/build-push-action@v6
+        with:
+          context: .  # Build context = repo root
+          push: true  # Push image after build
+          platforms: linux/amd64  # Target platform for ECS Fargate
+          tags: ${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPO }}:latest
+          # Push as :latest (service must reference this tag)
+
+      - name: Force new ECS deployment
+        run: |  # Tell ECS to roll tasks and pull new :latest
+          aws ecs update-service \
+            --cluster "$ECS_CLUSTER" \
+            --service "$ECS_SERVICE" \
+            --force-new-deployment \
+            --region "$AWS_REGION"
+
+      - name: Smoke check
+        run: curl -sfm 20 http://3.106.149.75/api/docs > /dev/null
