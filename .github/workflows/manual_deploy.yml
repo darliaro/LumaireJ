@@ -14,7 +14,7 @@ concurrency:
 env:
   AWS_REGION: ap-southeast-2
   ACCOUNT_ID: 382467720155
-  ECR_REPO: lumairej-api
+  ECR_REPO: lumairej
   ECS_CLUSTER: lumairej-cluster
   ECS_SERVICE: lumairej-service
 
