@@ -2,15 +2,15 @@ name: Deploy to ECS
 
 on:
   push:
-    branches: [main]        # Deploy only from main
-  workflow_dispatch: {}     # Manual trigger option
+    branches: [main]  # Deploy only from main
+  workflow_dispatch: {}  # Allow manual runs
 
 permissions:
-  id-token: write           # OIDC to AWS
+  id-token: write  # OIDC to AWS
   contents: read
 
 concurrency:
-  group: prod-deploy        # Prevent concurrent deploys
+  group: prod-deploy  # Prevent concurrent prod deploys
   cancel-in-progress: false
 
 env:
@@ -21,7 +21,9 @@ env:
   ECS_SERVICE: ${{ vars.ECS_SERVICE }}
   TASK_FAMILY: ${{ vars.TASK_FAMILY }}
   CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
-  PUBLIC_CHECK_URL: http://3.106.149.75/api/docs
+  PUBLIC_CHECK_URL: ${{ vars.PUBLIC_CHECK_URL }}
+  TASK_ROLE_ARN: ${{ vars.TASK_ROLE_ARN }}
+  EXEC_ROLE_ARN: ${{ vars.EXEC_ROLE_ARN }}
 
 jobs:
   deploy:
@@ -30,16 +32,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Configure AWS (OIDC) # Assume AWS role via OIDC
+      - name: Configure AWS (OIDC)  # Assume AWS role via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Login to ECR # docker login
+      - name: Login to ECR  # docker login
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Compute image tags # short SHA and latest
+      - name: Compute image tags  # short SHA and latest
         id: meta
         run: |
           SHA_TAG=${GITHUB_SHA::7}
@@ -47,7 +49,7 @@ jobs:
           echo "image=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${SHA_TAG}" >> $GITHUB_OUTPUT
           echo "image_latest=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:latest" >> $GITHUB_OUTPUT
 
-      - name: Build & Push images # to ECR
+      - name: Build & Push images  # push to ECR
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -58,35 +60,35 @@ jobs:
             ${{ steps.meta.outputs.image }}
             ${{ steps.meta.outputs.image_latest }}
 
-      - name: Read current task def revision # for rollback
+      - name: Read current task def  # capture current revision for rollback
         id: current
         run: |
           ARN=$(aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" \
             --query 'services[0].taskDefinition' --output text)
           echo "current_td_arn=$ARN" >> $GITHUB_OUTPUT
 
-      - name: Render taskdef (swap image) # update container image
-        id: render
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: infra/ecs/task-def.template.json
-          container-name: ${{ env.CONTAINER_NAME }}
-          image: ${{ steps.meta.outputs.image }}
+      - name: Render taskdef (image + roles)  # ensure iam:PassRole targets are set
+        run: |
+          jq --arg img "${{ steps.meta.outputs.image }}" \
+             --arg tr "${{ env.TASK_ROLE_ARN }}" \
+             --arg er "${{ env.EXEC_ROLE_ARN }}" \
+             '.containerDefinitions[0].image=$img
+              | .taskRoleArn=$tr
+              | .executionRoleArn=$er' \
+             infra/ecs/task-def.template.json > taskdef.json
 
-      - name: Deploy to ECS # rolling update
-        id: ecs-deploy
+      - name: Deploy to ECS  # rolling update
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
-          task-definition: ${{ steps.render.outputs.task-definition }}
+          task-definition: taskdef.json
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
 
-      - name: Smoke test # quick health check
-        id: smoke
+      - name: Smoke test  # quick health check
         run: curl -sSf -m 20 "${PUBLIC_CHECK_URL}" > /dev/null
 
-      - name: Rollback # if deploy/smoke failed
+      - name: Rollback  # auto-rollback on failure
         if: failure() && steps.current.outputs.current_td_arn != ''
         run: |
           aws ecs update-service \
