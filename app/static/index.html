@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LumaireJ🖤🤍 — Journaling</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ivory-1: #f5f1e8;
+            --ivory-2: #ebe4d8;
+            --sage-1: #e0e8e0;
+            --sage-2: #c8d5c8;
+            --sage-3: #8ba68b;
+            --sage-4: #5a7a5a;
+            --text: #1a2a1a;
+            --muted: #4a5a4a;
+            --white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Crimson Text', Georgia, serif;
+            background: linear-gradient(135deg, var(--ivory-1) 0%, var(--sage-1) 100%);
+            min-height: 100vh;
+            color: var(--text);
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+        .header { text-align: center; margin-bottom: 3rem; color: var(--text); }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        .tagline {
+            font-family: 'Crimson Text', serif;
+            font-style: italic;
+            font-size: 1.1rem;
+            margin-top: 0.75rem;
+            color: var(--muted);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.85rem 1.4rem;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 600;
+            font-family: 'Crimson Text', serif;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0,0,0,0.08); }
+        .btn-primary { background: linear-gradient(135deg, var(--sage-3), var(--sage-4)); color: var(--white); }
+        .btn-ghost { background: var(--white); color: var(--sage-4); border: 1px solid var(--sage-2); }
+
+        .main-content { background: rgba(255, 255, 255, 0.9); border-radius: 18px; padding: 2.2rem; box-shadow: 0 14px 36px rgba(0,0,0,0.06); backdrop-filter: blur(6px); }
+
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.4rem; margin: 2rem 0 2.4rem; }
+
+        .feature-card { background: linear-gradient(180deg, var(--ivory-2), var(--white)); padding: 1.6rem; border-radius: 14px; box-shadow: 0 8px 22px rgba(0,0,0,0.05); border: 1px solid var(--sage-2); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .feature-card:hover { transform: translateY(-2px); box-shadow: 0 16px 30px rgba(0,0,0,0.08); }
+        .feature-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.6rem;
+            color: var(--text);
+        }
+        .feature-description {
+            color: var(--muted);
+            line-height: 1.6;
+            font-size: 0.98rem;
+            font-style: italic;
+        }
+
+        .cta { text-align: center; background: linear-gradient(135deg, var(--ivory-2), var(--sage-2)); border: 1px solid var(--sage-2); border-radius: 14px; padding: 1.6rem; }
+        .cta h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 500;
+            margin-bottom: 0.6rem;
+        }
+        .cta p { color: var(--muted); margin-bottom: 1.2rem; font-style: italic; }
+
+        .nav-links { text-align: center; margin-top: 1.8rem; }
+        .nav-links a { color: var(--sage-4); text-decoration: none; margin: 0 0.8rem; font-weight: 500; }
+        .nav-links a:hover { text-decoration: underline; }
+
+        @media (max-width: 768px) {
+            .container { padding: 1.25rem; }
+            .logo { font-size: 2.1rem; }
+            .main-content { padding: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">LumaireJ🖤🤍</h1>
+            <p class="tagline">Quiet space for reflection</p>
+        </header>
+
+        <main class="main-content">
+            <section class="features">
+                <article class="feature-card">
+                    <h3 class="feature-title">Write</h3>
+                    <p class="feature-description">Capture a moment as it is. No pressure, no metrics, just your words.</p>
+                </article>
+                <article class="feature-card">
+                    <h3 class="feature-title">Notice</h3>
+                    <p class="feature-description">Name what you feel and gently track patterns over time.</p>
+                </article>
+                <article class="feature-card">
+                    <h3 class="feature-title">Revisit</h3>
+                    <p class="feature-description">Return when you're ready. Your space stays quiet and yours.</p>
+                </article>
+            </section>
+
+            <div class="cta">
+                <h2>Begin softly</h2>
+                <p>A single line is enough today.</p>
+                <a href="/static/journal.html" class="btn btn-primary">Start writing</a>
+            </div>
+
+            <div class="nav-links">
+                <a href="/static/journal.html">Journal</a>
+                <a href="/api/docs">API Docs</a>
+                <a href="https://github.com/darliaro/lumairej" target="_blank" rel="noreferrer noopener">GitHub</a>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

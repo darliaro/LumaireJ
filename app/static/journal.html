@@ -2,25 +2,268 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Create Journal Entry</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Journal Entry - LumaireJ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ivory-1: #f5f1e8;
+            --ivory-2: #ebe4d8;
+            --sage-1: #e0e8e0;
+            --sage-2: #c8d5c8;
+            --sage-3: #8ba68b;
+            --sage-4: #5a7a5a;
+            --text: #1a2a1a;
+            --muted: #4a5a4a;
+            --white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Crimson Text', Georgia, serif;
+            background: linear-gradient(135deg, var(--ivory-1) 0%, var(--sage-1) 100%);
+            min-height: 100vh;
+            color: var(--text);
+        }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+
+        .header { text-align: center; margin-bottom: 1.5rem; color: var(--text); }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 400;
+            color: var(--muted);
+            margin-top: 0.4rem;
+        }
+
+        .main-content { background: rgba(255, 255, 255, 0.92); border-radius: 18px; padding: 2rem; box-shadow: 0 14px 36px rgba(0,0,0,0.06); backdrop-filter: blur(6px); }
+
+        .form-group { margin-bottom: 1.6rem; }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text);
+            font-size: 1.05rem;
+        }
+
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--sage-2);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            background: var(--white);
+        }
+
+        textarea:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: var(--sage-3);
+            box-shadow: 0 0 0 3px rgba(139, 166, 139, 0.18);
+        }
+
+        textarea { resize: vertical; min-height: 140px; }
+
+        .btn {
+            display: inline-block;
+            padding: 0.9rem 1.6rem;
+            background: linear-gradient(135deg, var(--sage-3), var(--sage-4));
+            color: var(--white);
+            text-decoration: none;
+            border: none;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 1rem;
+            font-family: 'Crimson Text', serif;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+        }
+
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 12px 24px rgba(0,0,0,0.12); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .response { margin-top: 1.4rem; padding: 1rem; border-radius: 12px; font-weight: 500; text-align: center; }
+        .response.success { background: #e7f6ec; color: #235c37; border: 1px solid #cfe9d8; }
+        .response.error { background: #fdecec; color: #7a2327; border: 1px solid #f7c7cb; }
+
+        .nav-links { text-align: center; margin-top: 1.6rem; }
+        .nav-links a { color: var(--sage-4); text-decoration: none; margin: 0 0.8rem; font-weight: 500; }
+        .nav-links a:hover { text-decoration: underline; }
+
+        .mood-suggestions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.8rem;
+            margin-top: 0.8rem;
+        }
+
+        .mood-tag {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.6rem 0.8rem;
+            background: var(--ivory-2);
+            border: 1px solid var(--sage-2);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+            font-size: 0.9rem;
+            user-select: none;
+        }
+        .mood-tag:hover {
+            transform: translateY(-1px);
+            background: var(--white);
+            border-color: var(--sage-3);
+        }
+        .mood-emoji { font-size: 1.2rem; }
+        .mood-label {
+            font-family: 'Crimson Text', serif;
+            font-style: italic;
+            color: var(--muted);
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .main-content { padding: 1.4rem; }
+            .logo { font-size: 1.7rem; }
+            .mood-suggestions { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
-    <h1>New Journal Entry</h1>
-    <form id="journal-form">
-        <label for="content">Content:</label><br>
-        <textarea id="content" name="content" rows="8" cols="40" required></textarea><br><br>
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">LumaireJ🖤🤍</h1>
+            <p class="subtitle">Write when you're ready</p>
+        </header>
 
-        <label for="mood">Mood:</label><br>
-        <input id="mood" type="text" name="mood" maxlength="50"><br><br>
+        <main class="main-content">
+            <form id="journal-form">
+                <div class="form-group">
+                    <label for="content">Your note</label>
+                    <textarea
+                        id="content"
+                        name="content"
+                        placeholder="Write freely…"
+                        required
+                    ></textarea>
+                </div>
 
-        <button type="submit">Submit</button>
-    </form>
+                <div class="form-group">
+                    <label for="mood">Mood (optional)</label>
+                    <input
+                        id="mood"
+                        type="text"
+                        name="mood"
+                        maxlength="50"
+                        placeholder="Pick a mood below or type your own"
+                    >
+                    <div class="mood-suggestions">
+                        <span class="mood-tag" onclick="setMood('😍', 'In Love')">
+                            <span class="mood-emoji">😍</span>
+                            <span class="mood-label">In Love</span>
+                        </span>
+                        <span class="mood-tag" onclick="setMood('🤩', 'Excited')">
+                            <span class="mood-emoji">🤩</span>
+                            <span class="mood-label">Excited</span>
+                        </span>
+                        <span class="mood-tag" onclick="setMood('😊', 'Happy')">
+                            <span class="mood-emoji">😊</span>
+                            <span class="mood-label">Happy</span>
+                        </span>
+                        <span class="mood-tag" onclick="setMood('🤗', 'Grateful')">
+                            <span class="mood-emoji">🤗</span>
+                            <span class="mood-label">Grateful</span>
+                        </span>
+                        <span class="mood-tag" onclick="setMood('😌', 'Calm')">
+                            <span class="mood-emoji">😌</span>
+                            <span class="mood-label">Calm</span>
+                        </span>
+                        <span class="mood-tag" onclick="setMood('🙂', 'Content')">
+                            <span class="mood-emoji">🙂</span>
+                            <span class="mood-label">Content</span>
+                        </span>
+                        <span class="mood-tag" onclick="setMood('😐', 'Neutral')">
+                            <span class="mood-emoji">😐</span>
+                            <span class="mood-label">Neutral</span>
+                        </span>
+                        <span class="mood-tag" onclick="setMood('🤔', 'Thoughtful')">
+                            <span class="mood-emoji">🤔</span>
+                            <span class="mood-label">Thoughtful</span>
+                        </span>
+                        <span class="mood-tag" onclick="setMood('😕', 'Confused')">
+                            <span class="mood-emoji">😕</span>
+                            <span class="mood-label">Confused</span>
+                        </span>
+                        <span class="mood-tag" onclick="setMood('😴', 'Tired')">
+                            <span class="mood-emoji">😴</span>
+                            <span class="mood-label">Tired</span>
+                        </span>
+                        <span class="mood-tag" onclick="setMood('😔', 'Sad')">
+                            <span class="mood-emoji">😔</span>
+                            <span class="mood-label">Sad</span>
+                        </span>
+                        <span class="mood-tag" onclick="setMood('😰', 'Anxious')">
+                            <span class="mood-emoji">😰</span>
+                            <span class="mood-label">Anxious</span>
+                        </span>
+                        <span class="mood-tag" onclick="setMood('😤', 'Frustrated')">
+                            <span class="mood-emoji">😤</span>
+                            <span class="mood-label">Frustrated</span>
+                        </span>
+                        <span class="mood-tag" onclick="setMood('😠', 'Angry')">
+                            <span class="mood-emoji">😠</span>
+                            <span class="mood-label">Angry</span>
+                        </span>
+                        <span class="mood-tag" onclick="setMood('😭', 'Devastated')">
+                            <span class="mood-emoji">😭</span>
+                            <span class="mood-label">Devastated</span>
+                        </span>
+                    </div>
+                </div>
 
-    <div id="response" style="margin-top: 1em;"></div>
+                <button type="submit" class="btn" id="submit-btn">Save entry</button>
+            </form>
+
+            <div id="response" class="response" style="display: none;"></div>
+
+            <div class="nav-links">
+                <a href="/">← Home</a>
+                <a href="/api/docs">API Docs</a>
+            </div>
+        </main>
+    </div>
 
     <script>
+        function setMood(emoji, label) {
+            document.getElementById('mood').value = emoji + ' ' + label;
+        }
+
         document.getElementById('journal-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            const submitBtn = document.getElementById('submit-btn');
+            const responseDiv = document.getElementById('response');
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
+            responseDiv.style.display = 'none';
 
             const content = e.target.content.value.trim();
             const mood = e.target.mood.value.trim();
@@ -28,22 +271,42 @@
             const payload = { content };
             if (mood) payload.mood = mood;
 
-            const response = await fetch('/api/v1/journal', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            try {
+                const response = await fetch('/api/v1/journal', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
-            const result = document.getElementById('response');
-            if (response.ok) {
-                const data = await response.json();
-                result.style.color = 'green';
-                result.textContent = 'Entry created! ID: ' + data.id;
-                e.target.reset();
-            } else {
-                const errorText = await response.text();
-                result.style.color = 'red';
-                result.textContent = 'Error ' + response.status + ': ' + errorText;
+                responseDiv.style.display = 'block';
+
+                if (response.ok) {
+                    const data = await response.json();
+                    responseDiv.className = 'response success';
+                    responseDiv.innerHTML = `
+                        <strong>Saved</strong><br>
+                        id: ${data.id}<br>
+                        at: ${new Date(data.created_at).toLocaleString()}
+                    `;
+                    e.target.reset();
+                } else {
+                    const errorText = await response.text();
+                    responseDiv.className = 'response error';
+                    responseDiv.innerHTML = `
+                        <strong>Error ${response.status}</strong><br>
+                        ${errorText}
+                    `;
+                }
+            } catch (error) {
+                responseDiv.style.display = 'block';
+                responseDiv.className = 'response error';
+                responseDiv.innerHTML = `
+                    <strong>Network error</strong><br>
+                    Please try again.
+                `;
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Save entry';
             }
         });
     </script>
