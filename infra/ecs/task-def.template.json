@@ -5,7 +5,7 @@
   "cpu": "256",
   "memory": "512",
 
-  "executionRoleArn": "${EXECUTION_ROLE_ARN}",
+  "executionRoleArn": "${EXEC_ROLE_ARN}",
   "taskRoleArn": "${TASK_ROLE_ARN}",
 
   "containerDefinitions": [
