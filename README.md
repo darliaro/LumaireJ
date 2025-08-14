@@ -12,12 +12,30 @@
 ---
 
 ## Features (MVP)
-- Daily emotion & mood journaling with optional tags/triggers
-- Soft affirmations and prompts on entry or via Telegram bot (TBD)
-- View, edit, and delete past journal entries
-- Visualization of emotional trends using charts
-- Calm, minimal UI with FastAPI, Jinja2 & HTMX
-- Testable and maintainable codebase with CI-friendly structure
+- **Beautiful Landing Page** - Professional and aesthetic main page at `/`
+- **Daily emotion & mood journaling** with optional tags/triggers
+- **Enhanced UI/UX** - Modern, responsive design with smooth animations
+- **Mood Suggestions** - Quick mood selection with emojis
+- **View, edit, and delete past journal entries** (API endpoints)
+- **Visualization of emotional trends** using charts (planned)
+- **Calm, minimal UI** with FastAPI, Jinja2 & HTMX
+- **Testable and maintainable codebase** with CI-friendly structure
+
+---
+
+## Quick Start
+
+### **Option 1: Direct Access**
+1. Start the application: `pdm run dev`
+2. Open your browser at: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+
+### **Option 2: Journal Interface**
+1. Navigate to: [http://127.0.0.1:8000/static/journal.html](http://127.0.0.1:8000/static/journal.html)
+2. Or click "Create Your First Entry" from the main page
+
+### **Option 3: API Documentation**
+- Swagger UI: [http://127.0.0.1:8000/api/docs](http://127.0.0.1:8000/api/docs)
+- ReDoc: [http://127.0.0.1:8000/api/redoc](http://127.0.0.1:8000/api/redoc)
 
 ---
 
@@ -43,22 +61,21 @@
 - [ ] Create `.env` file for environment variables:
   ```bash
   touch .env
+  echo "database_url=sqlite:///./test.db" >> .env
+  echo "debug=true" >> .env
   ```
 
 ---
 
-## DB Migrations
-- [ ] Populate `.env` with the correct connection string:
-  ```bash
-  echo "DATABASE_URL=postgresql://<USER>:<PASS>@<HOST>:5432/<DB_NAME>" >> .env
+## Running the App Locally
+Start the FastAPI server with:
 
-- [ ] Generate a new migration revision:
-  ```bash
-  pdm run alembic -c pyproject.toml revision --autogenerate -m "Initial migration"
+```bash
+pdm run dev
+```
 
-- [ ] Apply all pending migrations:
-  ```bash
-  pdm run alembic -c pyproject.toml upgrade head
+Then open your browser at:
+[http://127.0.0.1:8000](http://127.0.0.1:8000)
 
 ---
 
@@ -123,3 +140,5 @@ allure open allure-report
 - Advanced visualizations of emotion trends
 - User authentication (optional)
 - Deployment with Docker
+- Dark/Light theme toggle
+- Export functionality (PDF, JSON)
