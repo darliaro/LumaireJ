@@ -22,7 +22,7 @@
       "secrets": [
         {
           "name": "DATABASE_URL",
-          "valueFrom": "${SSM_DB_PARAM_ARN}"
+          "valueFrom": "/lumairej/prod/DATABASE_URL"
         }
       ],
       "logConfiguration": {
