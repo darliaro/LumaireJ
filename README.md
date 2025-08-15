@@ -1,4 +1,4 @@
-[![Python 3.10+](https://img.shields.io/badge/Python-3.13+-black.svg)](https://www.python.org/)
+[![Python 3.13+](https://img.shields.io/badge/Python-3.13+-black.svg)](https://www.python.org/)
 [![HTMX](https://img.shields.io/badge/HTMX-purple?logo=html5)](https://htmx.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-teal?logo=fastapi)](https://fastapi.tiangolo.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-green?logo=postgresql)](https://www.postgresql.org/)
