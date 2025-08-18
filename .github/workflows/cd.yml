@@ -52,7 +52,6 @@ jobs:
           echo "image_latest=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:latest" >> $GITHUB_OUTPUT
 
       - name: Build & Push images  # push to ECR
-        id: build
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -62,8 +61,6 @@ jobs:
           tags: |
             ${{ steps.meta.outputs.image }}
             ${{ steps.meta.outputs.image_latest }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
       - name: Read current task def  # capture current revision for rollback
         id: current
