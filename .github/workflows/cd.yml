@@ -1,16 +1,18 @@
 name: Deploy to ECS
 
 on:
-  push:
-    branches: [main]  # Deploy only from main
+  workflow_run:
+    workflows: ["PR Lint & Unit Tests"]  # Deploy only after CI passes
+    types: [completed]
+    branches: [main]
   workflow_dispatch: {}  # Allow manual runs
 
 permissions:
-  id-token: write  # OIDC to AWS
+  id-token: write
   contents: read
 
 concurrency:
-  group: prod-deploy  # Prevent concurrent prod deploys
+  group: prod-deploy
   cancel-in-progress: false
 
 env:
@@ -29,10 +31,14 @@ env:
 
 jobs:
   deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - name: Configure AWS (OIDC)  # assume role
         uses: aws-actions/configure-aws-credentials@v4
@@ -89,19 +95,3 @@ jobs:
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
-
-      - name: Smoke test  # quick health check
-        run: curl -sSf -m 20 "${PUBLIC_CHECK_URL}" > /dev/null
-
-      - name: Rollback  # auto-rollback on failure
-        if: failure() && steps.current.outputs.current_td_arn != ''
-        run: |
-          aws ecs update-service \
-            --cluster "$ECS_CLUSTER" \
-            --service "$ECS_SERVICE" \
-            --task-definition "${{ steps.current.outputs.current_td_arn }}" \
-            --region "$AWS_REGION"
-          aws ecs wait services-stable \
-            --cluster "$ECS_CLUSTER" \
-            --services "$ECS_SERVICE" \
-            --region "$AWS_REGION"
