@@ -154,7 +154,7 @@
         </header>
 
         <main class="main-content">
-            <form id="journal-form">
+    <form id="journal-form">
                 <div class="form-group">
                     <label for="content">Your note</label>
                     <textarea
@@ -239,7 +239,7 @@
                 </div>
 
                 <button type="submit" class="btn" id="submit-btn">Save entry</button>
-            </form>
+    </form>
 
             <div id="response" class="response" style="display: none;"></div>
 
@@ -272,25 +272,25 @@
             if (mood) payload.mood = mood;
 
             try {
-                const response = await fetch('/api/v1/journal', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+            const response = await fetch('/api/v1/journal', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
 
                 responseDiv.style.display = 'block';
 
-                if (response.ok) {
-                    const data = await response.json();
+            if (response.ok) {
+                const data = await response.json();
                     responseDiv.className = 'response success';
                     responseDiv.innerHTML = `
                         <strong>Saved</strong><br>
                         id: ${data.id}<br>
                         at: ${new Date(data.created_at).toLocaleString()}
                     `;
-                    e.target.reset();
-                } else {
-                    const errorText = await response.text();
+                e.target.reset();
+            } else {
+                const errorText = await response.text();
                     responseDiv.className = 'response error';
                     responseDiv.innerHTML = `
                         <strong>Error ${response.status}</strong><br>

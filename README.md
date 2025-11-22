@@ -135,10 +135,30 @@ allure open allure-report
 
 ---
 
+## Deployment
+
+### GitHub Pages
+The frontend is automatically deployed to GitHub Pages on every push to `main` branch.
+
+- **Live Site**: Available at `https://darliaro.github.io/LumaireJ/` (after first deployment)
+- **Deployment**: Automatic via GitHub Actions workflow (`.github/workflows/deploy-pages.yml`)
+- **Manual Deployment**: Go to repository Settings → Pages → Build and deployment
+
+### Local Development
+For full-stack development (frontend + backend API):
+
+```bash
+pdm run dev
+```
+
+Then access:
+- Frontend: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+- API Docs: [http://127.0.0.1:8000/api/docs](http://127.0.0.1:8000/api/docs)
+
 ## Future Enhancements
 - Telegram bot integration for check-ins and affirmations
 - Advanced visualizations of emotion trends
 - User authentication (optional)
-- Deployment with Docker
+- Backend API hosting (Vercel, Railway, or Render)
 - Dark/Light theme toggle
 - Export functionality (PDF, JSON)
