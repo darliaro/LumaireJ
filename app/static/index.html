@@ -136,20 +136,26 @@
 
                 // Try immediately in case elements already exist
                 if (!fixNavigationLinks()) {
+                    let observer = null;
                     // Use MutationObserver to watch for element creation
-                    const observer = new MutationObserver(function(mutations, obs) {
+                    observer = new MutationObserver(function(mutations, obs) {
                         if (fixNavigationLinks()) {
                             obs.disconnect();
                         }
                     });
-                    observer.observe(document.body, {
-                        childList: true,
-                        subtree: true
-                    });
+                    // Wait for body to be available before observing
+                    if (document.body) {
+                        observer.observe(document.body, {
+                            childList: true,
+                            subtree: true
+                        });
+                    }
                     // Fallback to DOMContentLoaded if MutationObserver doesn't catch it
                     document.addEventListener('DOMContentLoaded', function() {
                         fixNavigationLinks();
-                        observer.disconnect();
+                        if (observer) {
+                            observer.disconnect();
+                        }
                     });
                 }
             }
