@@ -3,7 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="api-url" content="">
     <title>LumaireJ | New entry</title>
+    <script>
+        // Set base href dynamically based on hostname
+        // For GitHub Pages: use /LumaireJ/ base path
+        // For local development: use /static/ path prefix
+        (function() {
+            const hostname = window.location.hostname;
+            const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
+
+            if (!isLocal) {
+                // GitHub Pages: set base href
+                const base = document.createElement('base');
+                base.href = '/LumaireJ/';
+                document.head.insertBefore(base, document.head.firstChild);
+            }
+            // Store the isLocal flag for later use in body
+            window.__isLocalDev = isLocal;
+        })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
@@ -147,6 +166,40 @@
     </style>
 </head>
 <body>
+    <script>
+        // Fix navigation links using MutationObserver to wait for elements
+        // This prevents race condition where script runs before DOM elements exist
+        (function() {
+            if (window.__isLocalDev) {
+                function fixNavigationLinks() {
+                    const homeLink = document.getElementById('home-link');
+                    if (homeLink && homeLink.dataset.localHref) {
+                        homeLink.href = homeLink.dataset.localHref;
+                        return true;
+                    }
+                    return false;
+                }
+
+                // Try immediately in case elements already exist
+                if (!fixNavigationLinks()) {
+                    // Use MutationObserver to watch for element creation
+                    const observer = new MutationObserver(function(mutations, obs) {
+                        if (fixNavigationLinks()) {
+                            obs.disconnect();
+                        }
+                    });
+                    observer.observe(document.body, {
+                        childList: true,
+                        subtree: true
+                    });
+                    // Fallback to DOMContentLoaded if MutationObserver doesn't catch it
+                    document.addEventListener('DOMContentLoaded', function() {
+                        fixNavigationLinks();
+                        observer.disconnect();
+                    });
+                }
+            }
+        })();
     <div class="container">
         <header class="header">
             <h1 class="logo">LumaireJ🖤🤍</h1>
@@ -154,7 +207,7 @@
         </header>
 
         <main class="main-content">
-            <form id="journal-form">
+    <form id="journal-form">
                 <div class="form-group">
                     <label for="content">Your note</label>
                     <textarea
@@ -239,13 +292,13 @@
                 </div>
 
                 <button type="submit" class="btn" id="submit-btn">Save entry</button>
-            </form>
+    </form>
 
             <div id="response" class="response" style="display: none;"></div>
 
             <div class="nav-links">
-                <a href="/">← Home</a>
-                <a href="/api/docs">API Docs</a>
+                <a href="index.html" id="home-link" data-local-href="/">← Home</a>
+                <a href="https://lumairej-api.vercel.app/api/docs" target="_blank">API Docs</a>
             </div>
         </main>
     </div>
@@ -253,6 +306,20 @@
     <script>
         function setMood(emoji, label) {
             document.getElementById('mood').value = emoji + ' ' + label;
+        }
+
+        // Get API URL from meta tag or use default
+        function getApiUrl() {
+            const metaTag = document.querySelector('meta[name="api-url"]');
+            const apiUrl = metaTag?.getAttribute('content')?.trim();
+            if (apiUrl) {
+                return apiUrl.endsWith('/') ? apiUrl.slice(0, -1) : apiUrl;
+            }
+            // Fallback: try local API first, then external
+            // For GitHub Pages, this will be the external API URL
+            return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                ? '' // Use relative path for local development
+                : 'https://lumairej-api.vercel.app'; // External API for production
         }
 
         document.getElementById('journal-form').addEventListener('submit', async (e) => {
@@ -271,26 +338,29 @@
             const payload = { content };
             if (mood) payload.mood = mood;
 
+            const apiUrl = getApiUrl();
+            const endpoint = `${apiUrl}/api/v1/journal`;
+
             try {
-                const response = await fetch('/api/v1/journal', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
 
                 responseDiv.style.display = 'block';
 
-                if (response.ok) {
-                    const data = await response.json();
+            if (response.ok) {
+                const data = await response.json();
                     responseDiv.className = 'response success';
                     responseDiv.innerHTML = `
                         <strong>Saved</strong><br>
                         id: ${data.id}<br>
                         at: ${new Date(data.created_at).toLocaleString()}
                     `;
-                    e.target.reset();
-                } else {
-                    const errorText = await response.text();
+                e.target.reset();
+            } else {
+                const errorText = await response.text();
                     responseDiv.className = 'response error';
                     responseDiv.innerHTML = `
                         <strong>Error ${response.status}</strong><br>
@@ -300,9 +370,10 @@
             } catch (error) {
                 responseDiv.style.display = 'block';
                 responseDiv.className = 'response error';
+                const isNetworkError = error instanceof TypeError && error.message.includes('fetch');
                 responseDiv.innerHTML = `
                     <strong>Network error</strong><br>
-                    Please try again.
+                    ${isNetworkError && !apiUrl ? 'Backend API is not available. Please configure the API URL or use local development mode.' : 'Please try again.'}
                 `;
             } finally {
                 submitBtn.disabled = false;

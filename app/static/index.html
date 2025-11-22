@@ -4,6 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LumaireJ | Emotional journaling</title>
+    <script>
+        // Set base href dynamically based on hostname
+        // For GitHub Pages: use /LumaireJ/ base path
+        // For local development: use /static/ path prefix
+        (function() {
+            const hostname = window.location.hostname;
+            const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
+
+            if (!isLocal) {
+                // GitHub Pages: set base href
+                const base = document.createElement('base');
+                base.href = '/LumaireJ/';
+                document.head.insertBefore(base, document.head.firstChild);
+            }
+            // Store the isLocal flag for later use in body
+            window.__isLocalDev = isLocal;
+        })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
@@ -102,6 +120,40 @@
     </style>
 </head>
 <body>
+    <script>
+        // Fix navigation links using MutationObserver to wait for elements
+        // This prevents race condition where script runs before DOM elements exist
+        (function() {
+            if (window.__isLocalDev) {
+                function fixNavigationLinks() {
+                    const journalLink = document.getElementById('journal-link');
+                    if (journalLink && journalLink.dataset.localHref) {
+                        journalLink.href = journalLink.dataset.localHref;
+                        return true;
+                    }
+                    return false;
+                }
+
+                // Try immediately in case elements already exist
+                if (!fixNavigationLinks()) {
+                    // Use MutationObserver to watch for element creation
+                    const observer = new MutationObserver(function(mutations, obs) {
+                        if (fixNavigationLinks()) {
+                            obs.disconnect();
+                        }
+                    });
+                    observer.observe(document.body, {
+                        childList: true,
+                        subtree: true
+                    });
+                    // Fallback to DOMContentLoaded if MutationObserver doesn't catch it
+                    document.addEventListener('DOMContentLoaded', function() {
+                        fixNavigationLinks();
+                        observer.disconnect();
+                    });
+                }
+            }
+        })();
     <div class="container">
         <header class="header">
             <h1 class="logo">LumaireJ🖤🤍</h1>
@@ -127,11 +179,11 @@
             <div class="cta">
                 <h2>Begin softly</h2>
                 <p>A single line is enough today.</p>
-                <a href="/static/journal.html" class="btn btn-primary">Start writing</a>
+                <a href="journal.html" class="btn btn-primary" id="journal-link" data-local-href="/static/journal.html">Start writing</a>
             </div>
 
             <div class="nav-links">
-                <a href="/api/docs">API Docs</a>
+                <a href="https://lumairej-api.vercel.app/api/docs" target="_blank">API Docs</a>
                 <a href="https://github.com/darliaro/lumairej" target="_blank" rel="noreferrer noopener">GitHub</a>
             </div>
         </main>
