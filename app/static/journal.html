@@ -167,13 +167,36 @@
 </head>
 <body>
     <script>
-        // Fix navigation links synchronously before DOM is fully loaded
-        // This prevents race condition where user clicks before DOMContentLoaded
+        // Fix navigation links using MutationObserver to wait for elements
+        // This prevents race condition where script runs before DOM elements exist
         (function() {
             if (window.__isLocalDev) {
-                const homeLink = document.getElementById('home-link');
-                if (homeLink && homeLink.dataset.localHref) {
-                    homeLink.href = homeLink.dataset.localHref;
+                function fixNavigationLinks() {
+                    const homeLink = document.getElementById('home-link');
+                    if (homeLink && homeLink.dataset.localHref) {
+                        homeLink.href = homeLink.dataset.localHref;
+                        return true;
+                    }
+                    return false;
+                }
+
+                // Try immediately in case elements already exist
+                if (!fixNavigationLinks()) {
+                    // Use MutationObserver to watch for element creation
+                    const observer = new MutationObserver(function(mutations, obs) {
+                        if (fixNavigationLinks()) {
+                            obs.disconnect();
+                        }
+                    });
+                    observer.observe(document.body, {
+                        childList: true,
+                        subtree: true
+                    });
+                    // Fallback to DOMContentLoaded if MutationObserver doesn't catch it
+                    document.addEventListener('DOMContentLoaded', function() {
+                        fixNavigationLinks();
+                        observer.disconnect();
+                    });
                 }
             }
         })();
