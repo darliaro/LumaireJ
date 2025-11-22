@@ -17,15 +17,9 @@
                 const base = document.createElement('base');
                 base.href = '/LumaireJ/';
                 document.head.insertBefore(base, document.head.firstChild);
-            } else {
-                // Local development: fix relative paths to use /static/
-                document.addEventListener('DOMContentLoaded', function() {
-                    const journalLink = document.getElementById('journal-link');
-                    if (journalLink) {
-                        journalLink.href = '/static/journal.html';
-                    }
-                });
             }
+            // Store the isLocal flag for later use in body
+            window.__isLocalDev = isLocal;
         })();
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -126,6 +120,17 @@
     </style>
 </head>
 <body>
+    <script>
+        // Fix navigation links synchronously before DOM is fully loaded
+        // This prevents race condition where user clicks before DOMContentLoaded
+        (function() {
+            if (window.__isLocalDev) {
+                const journalLink = document.getElementById('journal-link');
+                if (journalLink && journalLink.dataset.localHref) {
+                    journalLink.href = journalLink.dataset.localHref;
+                }
+            }
+        })();
     <div class="container">
         <header class="header">
             <h1 class="logo">LumaireJ🖤🤍</h1>
@@ -151,7 +156,7 @@
             <div class="cta">
                 <h2>Begin softly</h2>
                 <p>A single line is enough today.</p>
-                <a href="journal.html" class="btn btn-primary" id="journal-link">Start writing</a>
+                <a href="journal.html" class="btn btn-primary" id="journal-link" data-local-href="/static/journal.html">Start writing</a>
             </div>
 
             <div class="nav-links">

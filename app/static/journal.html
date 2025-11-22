@@ -18,15 +18,9 @@
                 const base = document.createElement('base');
                 base.href = '/LumaireJ/';
                 document.head.insertBefore(base, document.head.firstChild);
-            } else {
-                // Local development: fix relative paths to use /static/
-                document.addEventListener('DOMContentLoaded', function() {
-                    const homeLink = document.getElementById('home-link');
-                    if (homeLink) {
-                        homeLink.href = '/';
-                    }
-                });
             }
+            // Store the isLocal flag for later use in body
+            window.__isLocalDev = isLocal;
         })();
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -172,6 +166,17 @@
     </style>
 </head>
 <body>
+    <script>
+        // Fix navigation links synchronously before DOM is fully loaded
+        // This prevents race condition where user clicks before DOMContentLoaded
+        (function() {
+            if (window.__isLocalDev) {
+                const homeLink = document.getElementById('home-link');
+                if (homeLink && homeLink.dataset.localHref) {
+                    homeLink.href = homeLink.dataset.localHref;
+                }
+            }
+        })();
     <div class="container">
         <header class="header">
             <h1 class="logo">LumaireJ🖤🤍</h1>
@@ -269,7 +274,7 @@
             <div id="response" class="response" style="display: none;"></div>
 
             <div class="nav-links">
-                <a href="index.html" id="home-link">← Home</a>
+                <a href="index.html" id="home-link" data-local-href="/">← Home</a>
                 <a href="https://lumairej-api.vercel.app/api/docs" target="_blank">API Docs</a>
             </div>
         </main>
