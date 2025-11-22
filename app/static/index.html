@@ -3,8 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <base href="/LumaireJ/">
     <title>LumaireJ | Emotional journaling</title>
+    <script>
+        // Set base href dynamically based on hostname
+        // For GitHub Pages: use /LumaireJ/ base path
+        // For local development: use /static/ path prefix
+        (function() {
+            const hostname = window.location.hostname;
+            const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
+
+            if (!isLocal) {
+                // GitHub Pages: set base href
+                const base = document.createElement('base');
+                base.href = '/LumaireJ/';
+                document.head.insertBefore(base, document.head.firstChild);
+            } else {
+                // Local development: fix relative paths to use /static/
+                document.addEventListener('DOMContentLoaded', function() {
+                    const journalLink = document.getElementById('journal-link');
+                    if (journalLink) {
+                        journalLink.href = '/static/journal.html';
+                    }
+                });
+            }
+        })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
@@ -128,7 +151,7 @@
             <div class="cta">
                 <h2>Begin softly</h2>
                 <p>A single line is enough today.</p>
-                <a href="journal.html" class="btn btn-primary">Start writing</a>
+                <a href="journal.html" class="btn btn-primary" id="journal-link">Start writing</a>
             </div>
 
             <div class="nav-links">
