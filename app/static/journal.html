@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <base href="/LumaireJ/">
+    <meta name="api-url" content="">
     <title>LumaireJ | New entry</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -256,6 +257,20 @@
             document.getElementById('mood').value = emoji + ' ' + label;
         }
 
+        // Get API URL from meta tag or use default
+        function getApiUrl() {
+            const metaTag = document.querySelector('meta[name="api-url"]');
+            const apiUrl = metaTag?.getAttribute('content')?.trim();
+            if (apiUrl) {
+                return apiUrl.endsWith('/') ? apiUrl.slice(0, -1) : apiUrl;
+            }
+            // Fallback: try local API first, then external
+            // For GitHub Pages, this will be the external API URL
+            return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                ? '' // Use relative path for local development
+                : 'https://lumairej-api.vercel.app'; // External API for production
+        }
+
         document.getElementById('journal-form').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -272,8 +287,11 @@
             const payload = { content };
             if (mood) payload.mood = mood;
 
+            const apiUrl = getApiUrl();
+            const endpoint = `${apiUrl}/api/v1/journal`;
+
             try {
-            const response = await fetch('/api/v1/journal', {
+            const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -301,9 +319,10 @@
             } catch (error) {
                 responseDiv.style.display = 'block';
                 responseDiv.className = 'response error';
+                const isNetworkError = error instanceof TypeError && error.message.includes('fetch');
                 responseDiv.innerHTML = `
                     <strong>Network error</strong><br>
-                    Please try again.
+                    ${isNetworkError && !apiUrl ? 'Backend API is not available. Please configure the API URL or use local development mode.' : 'Please try again.'}
                 `;
             } finally {
                 submitBtn.disabled = false;
