@@ -167,39 +167,27 @@
 </head>
 <body>
     <script>
-        // Fix navigation links using MutationObserver to wait for elements
-        // This prevents race condition where script runs before DOM elements exist
+        // Fix navigation links for local development
+        // Wait for DOM to be fully loaded before accessing elements
         (function() {
             if (window.__isLocalDev) {
                 function fixNavigationLinks() {
                     const homeLink = document.getElementById('home-link');
                     if (homeLink && homeLink.dataset.localHref) {
                         homeLink.href = homeLink.dataset.localHref;
-                        return true;
                     }
-                    return false;
                 }
 
-                // Try immediately in case elements already exist
-                if (!fixNavigationLinks()) {
-                    // Use MutationObserver to watch for element creation
-                    const observer = new MutationObserver(function(mutations, obs) {
-                        if (fixNavigationLinks()) {
-                            obs.disconnect();
-                        }
-                    });
-                    observer.observe(document.body, {
-                        childList: true,
-                        subtree: true
-                    });
-                    // Fallback to DOMContentLoaded if MutationObserver doesn't catch it
-                    document.addEventListener('DOMContentLoaded', function() {
-                        fixNavigationLinks();
-                        observer.disconnect();
-                    });
+                // Use DOMContentLoaded to ensure all elements are available
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', fixNavigationLinks);
+                } else {
+                    // DOM is already loaded
+                    fixNavigationLinks();
                 }
             }
         })();
+    </script>
     <div class="container">
         <header class="header">
             <h1 class="logo">LumaireJ🖤🤍</h1>
