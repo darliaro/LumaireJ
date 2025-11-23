@@ -1,5 +1,5 @@
 # Use Python image
-FROM python:3.13-slim
+FROM python:3.14-slim
 
 # Exclude .pyc files and disable stdout buffering
 ENV PYTHONDONTWRITEBYTECODE=1
