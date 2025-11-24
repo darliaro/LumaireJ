@@ -15,8 +15,8 @@ load_dotenv()
 # Access Alembic configuration
 config = context.config
 
-# Get database URL from environment (primary `DATABASE_URL`, fallback to lower-case)
-database_url = os.getenv("DATABASE_URL") or os.getenv("database_url")  # noqa: SIM112
+# Get database URL from environment (prefer `database_url`, fallback to legacy `DATABASE_URL`)
+database_url = os.getenv("database_url") or os.getenv("DATABASE_URL")  # noqa: SIM112
 if not database_url:
     raise RuntimeError(
         "Set the database_url (or DATABASE_URL) environment variable before running Alembic"
