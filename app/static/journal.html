@@ -296,6 +296,25 @@
             document.getElementById('mood').value = emoji + ' ' + label;
         }
 
+        function renderResponse(variant, title, lines = []) {
+            const responseDiv = document.getElementById('response');
+            responseDiv.className = `response ${variant}`;
+            responseDiv.replaceChildren();
+
+            const titleNode = document.createElement('strong');
+            titleNode.textContent = title;
+            responseDiv.appendChild(titleNode);
+
+            lines.forEach((line) => {
+                responseDiv.appendChild(document.createElement('br'));
+                const textNode = document.createElement('span');
+                textNode.textContent = line;
+                responseDiv.appendChild(textNode);
+            });
+
+            responseDiv.style.display = 'block';
+        }
+
         // Get API URL from meta tag or use default
         function getApiUrl() {
             const metaTag = document.querySelector('meta[name="api-url"]');
@@ -319,6 +338,7 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Saving...';
             responseDiv.style.display = 'none';
+            responseDiv.replaceChildren();
 
             const content = e.target.content.value.trim();
             const mood = e.target.mood.value.trim();
@@ -330,39 +350,29 @@
             const endpoint = `${apiUrl}/api/v1/journal`;
 
             try {
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
-                responseDiv.style.display = 'block';
-
-            if (response.ok) {
-                const data = await response.json();
-                    responseDiv.className = 'response success';
-                    responseDiv.innerHTML = `
-                        <strong>Saved</strong><br>
-                        id: ${data.id}<br>
-                        at: ${new Date(data.created_at).toLocaleString()}
-                    `;
-                e.target.reset();
-            } else {
-                const errorText = await response.text();
-                    responseDiv.className = 'response error';
-                    responseDiv.innerHTML = `
-                        <strong>Error ${response.status}</strong><br>
-                        ${errorText}
-                    `;
+                if (response.ok) {
+                    const data = await response.json();
+                    renderResponse('success', 'Saved', [
+                        `id: ${data.id}`,
+                        `at: ${new Date(data.created_at).toLocaleString()}`
+                    ]);
+                    e.target.reset();
+                } else {
+                    const errorText = (await response.text()) || 'Unexpected error';
+                    renderResponse('error', `Error ${response.status}`, [errorText]);
                 }
             } catch (error) {
-                responseDiv.style.display = 'block';
-                responseDiv.className = 'response error';
                 const isNetworkError = error instanceof TypeError && error.message.includes('fetch');
-                responseDiv.innerHTML = `
-                    <strong>Network error</strong><br>
-                    ${isNetworkError && !apiUrl ? 'Backend API is not available. Please configure the API URL or use local development mode.' : 'Please try again.'}
-                `;
+                const fallbackMessage = isNetworkError && !apiUrl
+                    ? 'Backend API is not available. Please configure the API URL or use local development mode.'
+                    : 'Please try again.';
+                renderResponse('error', 'Network error', [fallbackMessage]);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Save entry';

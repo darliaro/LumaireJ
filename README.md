@@ -1,4 +1,4 @@
-[![Python 3.14+](https://img.shields.io/badge/Python-3.14+-black.svg)](https://www.python.org/)
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11+-black.svg)](https://www.python.org/)
 [![HTMX](https://img.shields.io/badge/HTMX-purple?logo=html5)](https://htmx.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-teal?logo=fastapi)](https://fastapi.tiangolo.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-green?logo=postgresql)](https://www.postgresql.org/)
@@ -40,7 +40,7 @@
 ---
 
 ## Initial Setup (Using PDM)
-- [ ] Install [Python](https://www.python.org/downloads/) (version 3.14+ recommended)
+- [ ] Install [Python](https://www.python.org/downloads/) (version 3.11 or 3.12 recommended)
 - [ ] Install [PDM](https://pdm-project.org/latest/#recommended-installation-method):
   ```bash
   curl -sSL https://pdm-project.org/install-pdm.py | python3
@@ -64,6 +64,8 @@
   echo "database_url=sqlite:///./test.db" >> .env
   echo "debug=true" >> .env
   ```
+  The FastAPI app and Alembic migrations both read the same `database_url` value (Alembic also
+  accepts the legacy `DATABASE_URL` variable for compatibility).
 
 ---
 
