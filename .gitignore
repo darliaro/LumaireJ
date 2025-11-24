@@ -77,6 +77,7 @@ ipython_config.py
 .idea/
 
 # === Project-local SQLite and sandbox ===
+*.db
 *.log
 db.sqlite3
 db.sqlite3-journal

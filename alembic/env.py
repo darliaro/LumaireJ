@@ -15,10 +15,12 @@ load_dotenv()
 # Access Alembic configuration
 config = context.config
 
-# Get database URL from environment
-database_url = os.getenv("DATABASE_URL")
+# Get database URL from environment (primary `DATABASE_URL`, fallback to lower-case)
+database_url = os.getenv("DATABASE_URL") or os.getenv("database_url")  # noqa: SIM112
 if not database_url:
-    raise RuntimeError("The DATABASE_URL environment variable is not defined")
+    raise RuntimeError(
+        "Set the database_url (or DATABASE_URL) environment variable before running Alembic"
+    )
 # set the SQLAlchemy URL in Alembic config
 config.set_main_option("sqlalchemy.url", database_url)
 
