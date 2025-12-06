@@ -12,14 +12,14 @@ Describe the issue clearly and concisely.
 
 ## Expected vs Actual Behavior
 
-- **Expected:**  
-- **Actual:**  
+- **Expected:**
+- **Actual:**
 
 ## Steps to Reproduce
 
-1. 
-2. 
-3. 
+1.
+2.
+3.
 
 ## Screenshots or Logs
 
