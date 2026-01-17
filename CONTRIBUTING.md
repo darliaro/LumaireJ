@@ -112,8 +112,29 @@
    git commit -m "[ARCH #51] Extract CORS config to Settings"
    ```
 8. **Push and create PR** referencing the issue
-9. **Run Claude Code review** on the PR (automatic for AI-assisted development)
-10. **Move issue to `Ready for Test`** after PR is ready
+9. **Fill out PR fields** (see below)
+10. **Run Claude Code review** on the PR (automatic for AI-assisted development)
+11. **Move issue to `Ready for Test`** after PR is ready
+
+### Required PR Fields
+
+Every PR must have these fields filled out:
+
+| Field | Value | Notes |
+|-------|-------|-------|
+| **Reviewers** | `darliaro` | Project owner reviews all PRs |
+| **Assignees** | `darliaro` | Always assign to project owner |
+| **Labels** | Select appropriate | Match the issue labels |
+| **Projects** | LumaireJ | Link to project board |
+
+```bash
+# Example: Fill PR fields via CLI
+gh pr edit <pr-number> \
+  --add-reviewer darliaro \
+  --add-assignee darliaro \
+  --add-label "improvement,BACKEND" \
+  --add-project "LumaireJ"
+```
 
 ### PR Review Checklist
 
