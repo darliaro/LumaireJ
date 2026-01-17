@@ -84,14 +84,35 @@
 
 ## Development Workflow
 
-1. Pick an issue from `To Do` column
-2. Move to `In Progress`
-3. Create feature branch: `git checkout -b <type>/<issue-number>-<short-description>`
-4. Make changes following project conventions
-5. Run tests: `pdm run pytest -sv tests/`
-6. Run linter: `pdm run lint`
-7. Create PR referencing the issue
-8. Move issue to `Ready for Test` after PR is ready
+### Starting Work on an Issue
+
+1. **Pick an issue** from `Backlog` or `To Do` column
+2. **Move to `In Progress`** on the project board (BEFORE creating branch)
+3. **Create a branch** using type-prefixed naming:
+   ```bash
+   git checkout -b <type>/<issue-number>-<short-description>
+   ```
+
+### Branch Naming Convention
+
+| Issue Type | Branch Prefix | Example |
+|------------|---------------|---------|
+| `[ARCH]` | `arch/` | `arch/51-cors-config-extraction` |
+| `[REFACTOR]` | `refactor/` | `refactor/52-validation-constants` |
+| `[FEAT]` | `feat/` | `feat/36-landing-page` |
+| `[FIX]` / Bug | `fix/` | `fix/42-login-error` |
+
+### Implementation Steps
+
+4. **Make changes** following project conventions
+5. **Run linter**: `pdm run lint`
+6. **Run tests**: `pdm run pytest -sv tests/`
+7. **Commit** with format: `[TYPE #issue] Description`
+   ```bash
+   git commit -m "[ARCH #51] Extract CORS config to Settings"
+   ```
+8. **Push and create PR** referencing the issue
+9. **Move issue to `Ready for Test`** after PR is ready
 
 ## Code Style
 
