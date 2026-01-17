@@ -112,7 +112,22 @@
    git commit -m "[ARCH #51] Extract CORS config to Settings"
    ```
 8. **Push and create PR** referencing the issue
-9. **Move issue to `Ready for Test`** after PR is ready
+9. **Run Claude Code review** on the PR (automatic for AI-assisted development)
+10. **Move issue to `Ready for Test`** after PR is ready
+
+### PR Review Checklist
+
+Every PR must be reviewed before merge. The review should cover:
+
+- [ ] Code follows project conventions
+- [ ] No security vulnerabilities (OWASP top 10)
+- [ ] No secrets or credentials exposed
+- [ ] Linting passes
+- [ ] Tests pass (or test gaps documented)
+- [ ] No breaking changes (or documented in PR)
+- [ ] Changes match the issue requirements
+
+**AI-Assisted Development Rule**: When using Claude Code or similar AI tools, always run a code review on every PR created before requesting human review.
 
 ## Code Style
 
