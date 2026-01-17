@@ -124,6 +124,9 @@ celerybeat.pid
 *.mo
 *.pot
 
+# === Claude Code ===
+.claude/
+
 # === Miscellaneous ===
 .pypirc
 .spyderproject
