@@ -43,3 +43,9 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 async def root():
     """Serve the main page"""
     return FileResponse("app/static/index.html")
+
+
+@app.get("/health")
+async def health():
+    """Health check endpoint for container orchestration"""
+    return {"status": "healthy"}

@@ -16,8 +16,8 @@
 # Migrations or scripts
 !alembic/**
 
-# Tests
-!tests/**
+# Tests - excluded from production image
+# !tests/**
 
 # CI/CD and helper scripts
 !ci/**

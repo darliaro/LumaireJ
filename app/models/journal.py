@@ -18,4 +18,4 @@ class JournalEntry(SQLModel, table=True):
         default_factory=lambda: datetime.now(UTC),
         description="Timestamp of entry creation in UTC",
     )
-    mood: str | None = Field(description="Optional mood tag")
+    mood: str | None = Field(default=None, description="Optional mood tag")
