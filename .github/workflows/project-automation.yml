@@ -1,0 +1,181 @@
+name: Project Board Automation
+
+on:
+  issues:
+    types: [opened, closed]
+  pull_request:
+    types: [opened, closed]
+  pull_request_review:
+    types: [submitted]
+
+env:
+  PROJECT_ID: PVT_kwHODR8J4s4A9wbx
+  STATUS_FIELD_ID: PVTSSF_lAHODR8J4s4A9wbxzgxXTgM
+  # Status option IDs
+  BACKLOG_ID: f75ad846
+  IN_PROGRESS_ID: 47fc9ee4
+  AI_REVIEW_ID: 61e4505c
+  APPROVED_ID: df73e18b
+  DEPLOYED_ID: 98236657
+  DONE_ID: caff0873
+
+jobs:
+  # Add new issues to Backlog
+  issue-opened:
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add issue to project
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+        run: |
+          ITEM_ID=$(gh api graphql -f query='
+            mutation($project: ID!, $content: ID!) {
+              addProjectV2ItemById(input: {projectId: $project, contentId: $content}) {
+                item { id }
+              }
+            }' -f project="${{ env.PROJECT_ID }}" -f content="${{ github.event.issue.node_id }}" --jq '.data.addProjectV2ItemById.item.id')
+
+          gh api graphql -f query='
+            mutation($project: ID!, $item: ID!, $field: ID!, $value: String!) {
+              updateProjectV2ItemFieldValue(input: {projectId: $project, itemId: $item, fieldId: $field, value: {singleSelectOptionId: $value}}) {
+                projectV2Item { id }
+              }
+            }' -f project="${{ env.PROJECT_ID }}" -f item="$ITEM_ID" -f field="${{ env.STATUS_FIELD_ID }}" -f value="${{ env.BACKLOG_ID }}"
+
+  # Move closed issues to Done
+  issue-closed:
+    if: github.event_name == 'issues' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get project item ID
+        id: get-item
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+        run: |
+          ITEM_ID=$(gh api graphql -f query='
+            query($content: ID!) {
+              node(id: $content) {
+                ... on Issue {
+                  projectItems(first: 10) {
+                    nodes { id }
+                  }
+                }
+              }
+            }' -f content="${{ github.event.issue.node_id }}" --jq '.data.node.projectItems.nodes[0].id')
+          echo "item_id=$ITEM_ID" >> $GITHUB_OUTPUT
+
+      - name: Move to Done
+        if: steps.get-item.outputs.item_id != ''
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+        run: |
+          gh api graphql -f query='
+            mutation($project: ID!, $item: ID!, $field: ID!, $value: String!) {
+              updateProjectV2ItemFieldValue(input: {projectId: $project, itemId: $item, fieldId: $field, value: {singleSelectOptionId: $value}}) {
+                projectV2Item { id }
+              }
+            }' -f project="${{ env.PROJECT_ID }}" -f item="${{ steps.get-item.outputs.item_id }}" -f field="${{ env.STATUS_FIELD_ID }}" -f value="${{ env.DONE_ID }}"
+
+  # Add new PRs to AI Review
+  pr-opened:
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add PR to project and set AI Review
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+        run: |
+          ITEM_ID=$(gh api graphql -f query='
+            mutation($project: ID!, $content: ID!) {
+              addProjectV2ItemById(input: {projectId: $project, contentId: $content}) {
+                item { id }
+              }
+            }' -f project="${{ env.PROJECT_ID }}" -f content="${{ github.event.pull_request.node_id }}" --jq '.data.addProjectV2ItemById.item.id')
+
+          gh api graphql -f query='
+            mutation($project: ID!, $item: ID!, $field: ID!, $value: String!) {
+              updateProjectV2ItemFieldValue(input: {projectId: $project, itemId: $item, fieldId: $field, value: {singleSelectOptionId: $value}}) {
+                projectV2Item { id }
+              }
+            }' -f project="${{ env.PROJECT_ID }}" -f item="$ITEM_ID" -f field="${{ env.STATUS_FIELD_ID }}" -f value="${{ env.AI_REVIEW_ID }}"
+
+  # Move merged PRs to Deployed
+  pr-merged:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get project item ID
+        id: get-item
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+        run: |
+          ITEM_ID=$(gh api graphql -f query='
+            query($content: ID!) {
+              node(id: $content) {
+                ... on PullRequest {
+                  projectItems(first: 10) {
+                    nodes { id }
+                  }
+                }
+              }
+            }' -f content="${{ github.event.pull_request.node_id }}" --jq '.data.node.projectItems.nodes[0].id')
+          echo "item_id=$ITEM_ID" >> $GITHUB_OUTPUT
+
+      - name: Move to Deployed
+        if: steps.get-item.outputs.item_id != ''
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+        run: |
+          gh api graphql -f query='
+            mutation($project: ID!, $item: ID!, $field: ID!, $value: String!) {
+              updateProjectV2ItemFieldValue(input: {projectId: $project, itemId: $item, fieldId: $field, value: {singleSelectOptionId: $value}}) {
+                projectV2Item { id }
+              }
+            }' -f project="${{ env.PROJECT_ID }}" -f item="${{ steps.get-item.outputs.item_id }}" -f field="${{ env.STATUS_FIELD_ID }}" -f value="${{ env.DEPLOYED_ID }}"
+
+  # Handle PR reviews
+  pr-review:
+    if: github.event_name == 'pull_request_review'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get project item ID
+        id: get-item
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+        run: |
+          ITEM_ID=$(gh api graphql -f query='
+            query($content: ID!) {
+              node(id: $content) {
+                ... on PullRequest {
+                  projectItems(first: 10) {
+                    nodes { id }
+                  }
+                }
+              }
+            }' -f content="${{ github.event.pull_request.node_id }}" --jq '.data.node.projectItems.nodes[0].id')
+          echo "item_id=$ITEM_ID" >> $GITHUB_OUTPUT
+
+      - name: Move to In Progress (changes requested)
+        if: steps.get-item.outputs.item_id != '' && github.event.review.state == 'changes_requested'
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+        run: |
+          gh api graphql -f query='
+            mutation($project: ID!, $item: ID!, $field: ID!, $value: String!) {
+              updateProjectV2ItemFieldValue(input: {projectId: $project, itemId: $item, fieldId: $field, value: {singleSelectOptionId: $value}}) {
+                projectV2Item { id }
+              }
+            }' -f project="${{ env.PROJECT_ID }}" -f item="${{ steps.get-item.outputs.item_id }}" -f field="${{ env.STATUS_FIELD_ID }}" -f value="${{ env.IN_PROGRESS_ID }}"
+
+      - name: Move to Approved
+        if: steps.get-item.outputs.item_id != '' && github.event.review.state == 'approved'
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+        run: |
+          gh api graphql -f query='
+            mutation($project: ID!, $item: ID!, $field: ID!, $value: String!) {
+              updateProjectV2ItemFieldValue(input: {projectId: $project, itemId: $item, fieldId: $field, value: {singleSelectOptionId: $value}}) {
+                projectV2Item { id }
+              }
+            }' -f project="${{ env.PROJECT_ID }}" -f item="${{ steps.get-item.outputs.item_id }}" -f field="${{ env.STATUS_FIELD_ID }}" -f value="${{ env.APPROVED_ID }}"
