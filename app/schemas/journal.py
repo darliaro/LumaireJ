@@ -19,6 +19,19 @@ class JournalCreate(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True)
 
 
+class JournalUpdate(BaseModel):
+    content: constr(min_length=CONTENT_MIN_LENGTH, max_length=CONTENT_MAX_LENGTH) | None = Field(
+        default=None,
+        description="Main textual content",
+    )
+    mood: constr(max_length=MOOD_MAX_LENGTH) | None = Field(
+        default=None,
+        description="Mood tag",
+    )
+
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+
 class JournalRead(BaseModel):
     id: PositiveInt = Field(
         ...,
@@ -31,6 +44,10 @@ class JournalRead(BaseModel):
     created_at: datetime = Field(
         ...,
         description="Timestamp of entry creation in UTC",
+    )
+    updated_at: datetime | None = Field(
+        default=None,
+        description="Timestamp of last modification in UTC",
     )
     mood: str | None = Field(
         default=None,

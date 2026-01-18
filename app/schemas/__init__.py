@@ -1,1 +1,1 @@
-from .journal import JournalCreate, JournalRead  # noqa: F401
+from .journal import JournalCreate, JournalRead, JournalUpdate  # noqa: F401
