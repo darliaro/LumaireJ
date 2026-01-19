@@ -8,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from app.api.v1.api import api_router
 from app.core.config import settings
 from app.core.database import init_db
+from app.core.exceptions import register_exception_handlers
 
 
 @asynccontextmanager
@@ -34,6 +35,8 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "Accept"],
 )
+
+register_exception_handlers(app)
 
 app.include_router(api_router, prefix="/api/v1")
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
