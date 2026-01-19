@@ -37,22 +37,41 @@ This modular structure is intentional (see `docs/adr/001-keep-modular-architectu
 
 **Every change MUST start with a GitHub issue before any code.**
 
-1. Create issue using template from `.github/ISSUE_TEMPLATE/`:
-   - `bug_report.md` - Defects
-   - `feature_request.md` - New functionality
-   - `refactor.md` - Code improvements (no behavior change)
-   - `architecture_task.md` - Infrastructure changes
+### Automated Workflow with Claude Commands
 
-2. Add to project board:
-   ```bash
-   gh issue create --title "[TYPE] Description" --body "..." --label "labels" --assignee darliaro
-   gh project item-add 1 --owner darliaro --url <issue-url>
-   ```
+The project uses Claude commands (in `.claude/commands/`) to streamline development. GitHub automation handles project board transitions.
 
-3. Create branch AFTER issue exists:
-   ```bash
-   git checkout -b <type>/<issue-number>-<short-description>
-   ```
+```
+Concept → /new-issue → 📋 Backlog (GitHub auto)
+              ↓
+       /start-work → 🔄 In Progress (auto)
+              ↓
+    Code + /check + /commit (repeat)
+              ↓
+          /pr → 🤖 AI Review (GitHub auto)
+              ↓
+       /review-pr → Decision:
+              ├─ APPROVED → auto-merge → ✅ Approved → 🚀 Deployed (GitHub auto)
+              │                              ↓
+              │                         /complete → ✨ Done (GitHub auto)
+              │
+              └─ CHANGES → 🔄 In Progress (GitHub auto)
+                     ↓
+                  /fix → push → back to review
+```
+
+### Claude Commands Reference
+
+| Command | Purpose | Key Actions |
+|---------|---------|-------------|
+| `/new-issue` | Create GitHub issue | Creates issue, GitHub auto-adds to 📋 Backlog |
+| `/start-work <#>` | Begin development | Creates branch, auto-moves issue to 🔄 In Progress |
+| `/check` | Pre-commit validation | Runs lint + tests |
+| `/commit [msg]` | Create commit | Formats with `[TYPE #issue]` + Co-Authored-By |
+| `/pr [context]` | Create pull request | Runs checks, creates PR, GitHub auto-moves to 🤖 AI Review |
+| `/review-pr <#>` | Review and decide | Approves + auto-merges OR requests changes |
+| `/fix` | Fix post-review | Handles fix loop: fetch feedback → check → commit → push |
+| `/complete <#>` | Post-merge cleanup | Updates local repo, deletes branch |
 
 ### Branch Naming
 
@@ -76,45 +95,28 @@ Examples:
 - `[FIX #42] Handle null mood in validation`
 - `[REFACTOR #57] Remove redundant whitespace stripping`
 
-### Pull Request Process
+### GitHub Automation
 
-1. Push branch and create PR:
-   ```bash
-   git push -u origin <branch>
-   gh pr create --title "[TYPE #issue] Description" --body "..." \
-     --assignee darliaro --reviewer darliaro --label "labels"
-   ```
+Project board transitions are automated via `.github/workflows/project-automation.yml`:
+- **Issue created** → 📋 Backlog
+- **`/start-work`** → 🔄 In Progress (via gh CLI)
+- **PR opened** → 🤖 AI Review
+- **Changes requested** → 🔄 In Progress
+- **Review approved** → ✅ Approved
+- **PR merged** → 🚀 Deployed
+- **Issue closed** → ✨ Done
 
-2. Add PR to project board:
-   ```bash
-   gh project item-add 1 --owner darliaro --url <pr-url>
-   ```
+**Required secret**: `PROJECT_TOKEN` - A GitHub PAT with `project` scope for project board access.
 
-3. **Review the PR** (required before merge):
-   - Code follows project conventions
-   - No security vulnerabilities (OWASP top 10)
-   - No secrets or credentials exposed
-   - Linting passes
-   - Tests pass
-   - Changes match issue requirements
+### Review Checklist
 
-4. After merge, move issue to "Done":
-   ```bash
-   gh project item-edit --project-id PVT_kwHODR8J4s4A9wbx \
-     --id <item-id> --field-id PVTSSF_lAHODR8J4s4A9wbxzgxXTgM \
-     --single-select-option-id caff0873
-   ```
-
-### Project Board Columns
-
-| Column | Meaning |
-|--------|---------|
-| Backlog | Accepted, waiting |
-| To Do | Planned for current cycle |
-| In Progress | Actively working |
-| Ready for Test | Code complete, awaiting QA |
-| QA | Being tested |
-| Done | Verified complete |
+Before approving a PR, verify:
+- Code follows project conventions
+- No security vulnerabilities (OWASP top 10)
+- No secrets or credentials exposed
+- Linting passes (`pdm run lint`)
+- Tests pass (`pdm run test`)
+- Changes match issue requirements
 
 ---
 

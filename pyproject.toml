@@ -3,9 +3,9 @@ name = "LumaireJ"
 version = "0.1.0"
 description = "A journaling app for emotional self-awareness and reflection"
 authors = [
-    {name = "Darli Ro", email = "glicerinn@gmail.com"},
+    {name = "Darie Ro", email = "glicerinn@gmail.com"},
 ]
-requires-python = ">=3.11,<3.15"
+requires-python = ">=3.14,<3.15"
 readme = "README.md"
 
 dependencies = [
@@ -43,7 +43,7 @@ testpaths = ["tests"]
 addopts = "-ra -q"
 
 [tool.ruff]
-target-version = "py312"
+target-version = "py314"
 line-length = 100
 indent-width = 4
 exclude = ["__pypackages__", ".venv", "alembic/versions"]
