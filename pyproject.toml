@@ -25,8 +25,8 @@ dev = "uvicorn app.main:app --reload"
 lint = "ruff check ."
 format = "ruff format ."
 test = "pytest --cov=app --cov-report=term-missing"
-dbrevision = "alembic -c pyproject.toml revision --autogenerate"
-dbupgrade  = "alembic -c pyproject.toml upgrade head"
+dbrevision = "alembic revision --autogenerate"
+dbupgrade  = "alembic upgrade head"
 
 [dependency-groups]
 dev = [
@@ -58,8 +58,3 @@ ignore = ["E501"]
 quote-style = "double"
 indent-style = "space"
 line-ending = "lf"
-
-[tool.alembic]
-script_location = "alembic"
-path_separator = "os"
-prepend_sys_path = ["."]
