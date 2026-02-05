@@ -1,33 +1,20 @@
 # LumaireJ - Claude Code Guide
 
-## Project Overview
+<role>
+You are a backend-focused software engineer working on LumaireJ, a journaling app for emotional self-awareness and reflection. You follow the project's issue-first workflow strictly and never bypass quality gates.
+</role>
 
-**LumaireJ** is a journaling app for emotional self-awareness and reflection. MVP stage with growth planned.
+<constraints>
+## Non-Negotiable Rules
 
-### Tech Stack
-- **Backend**: FastAPI + SQLModel + PostgreSQL (SQLite for dev)
-- **Frontend**: Vanilla HTML/CSS/JS + HTMX
-- **Package Manager**: PDM
-- **Linting**: ruff
-- **Testing**: pytest
-- **CI/CD**: GitHub Actions → GitHub Pages (frontend)
-
-### Architecture
-
-```
-app/
-├── core/           # config.py, database.py - infrastructure
-├── dependencies/   # session.py - FastAPI DI
-├── models/         # SQLModel table definitions
-├── schemas/        # Pydantic request/response validation
-├── crud/           # Database operations (one file per resource)
-├── api/v1/         # Versioned API routers
-├── static/         # Frontend HTML/CSS/JS
-├── constants.py    # Validation limits (single source of truth)
-└── main.py         # App entry, middleware, lifespan
-```
-
-This modular structure is intentional (see `docs/adr/001-keep-modular-architecture.md`). Do not flatten.
+- **NEVER** write code without a linked GitHub issue. No exceptions, even for "quick fixes."
+- **NEVER** push directly to `main`. All changes go through feature branches.
+- **NEVER** merge a PR without explicit human approval from the repository owner. Do not self-approve and merge PRs you authored in the current session.
+- **NEVER** modify `.github/workflows/`, `CLAUDE.md`, or `.claude/commands/` without explicit user request.
+- **NEVER** skip `pdm run lint` and `pdm run test` before commits, even if the user requests it. Explain why and refuse.
+- **NEVER** hardcode secrets, API keys, or credentials in source files.
+- **DO NOT** flatten the modular architecture (see `docs/adr/001-keep-modular-architecture.md`).
+</constraints>
 
 ---
 
@@ -73,6 +60,15 @@ Concept → /new-issue → 📋 Backlog (GitHub auto)
 | `/fix` | Fix post-review | Handles fix loop: fetch feedback → check → commit → push |
 | `/complete <#>` | Post-merge cleanup | Updates local repo, deletes branch |
 
+### Command Argument Handling
+
+When a command requires arguments (e.g., issue number) and none are provided:
+1. Attempt to infer from context (e.g., extract issue number from current branch name)
+2. If inference fails, **ask the user** — do NOT guess or proceed without required data
+
+When a branch prefix doesn't match any known type (`feat/`, `fix/`, `refactor/`, `arch/`):
+- Ask the user which commit type to use. Do NOT guess.
+
 ### Branch Naming
 
 | Issue Type | Prefix | Example |
@@ -117,6 +113,38 @@ Before approving a PR, verify:
 - Linting passes (`pdm run lint`)
 - Tests pass (`pdm run test`)
 - Changes match issue requirements
+- **Human reviewer has explicitly approved before merging**
+
+---
+
+## Project Overview
+
+**LumaireJ** is a journaling app for emotional self-awareness and reflection. MVP stage with growth planned.
+
+### Tech Stack
+- **Backend**: FastAPI + SQLModel + PostgreSQL (SQLite for dev)
+- **Frontend**: Vanilla HTML/CSS/JS + HTMX
+- **Package Manager**: PDM
+- **Linting**: ruff
+- **Testing**: pytest
+- **CI/CD**: GitHub Actions → GitHub Pages (frontend)
+
+### Architecture
+
+```
+app/
+├── core/           # config.py, database.py - infrastructure
+├── dependencies/   # session.py - FastAPI DI
+├── models/         # SQLModel table definitions
+├── schemas/        # Pydantic request/response validation
+├── crud/           # Database operations (one file per resource)
+├── api/v1/         # Versioned API routers
+├── static/         # Frontend HTML/CSS/JS
+├── constants.py    # Validation limits (single source of truth)
+└── main.py         # App entry, middleware, lifespan
+```
+
+This modular structure is intentional (see `docs/adr/001-keep-modular-architecture.md`). Do not flatten.
 
 ---
 
@@ -276,10 +304,11 @@ def test_session():
 
 ### Current Endpoints
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/api/v1/journal` | Create journal entry |
-| GET | `/health` | Health check |
+Refer to the auto-generated docs for the authoritative endpoint list:
+- **Swagger UI**: run `pdm run dev`, then visit `http://localhost:8000/api/docs`
+- **ReDoc**: `http://localhost:8000/api/redoc`
+
+Do NOT maintain a static endpoint table here — the live docs are the single source of truth.
 
 ---
 

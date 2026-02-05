@@ -36,11 +36,13 @@ Review a pull request following project conventions.
 5. **Make decision** based on review:
 
    **If APPROVED:**
-   - Submit approval:
+   - **STOP: Do NOT merge without human confirmation.** Present findings to the user and ask:
+     "PR #X passes all review checks. Approve and merge?"
+   - Only after the user explicitly confirms, submit approval:
      ```bash
      gh pr review <pr-number> --approve --body "LGTM - changes look good"
      ```
-   - Auto-merge the PR:
+   - Then merge the PR:
      ```bash
      gh pr merge <pr-number> --squash --delete-branch
      ```

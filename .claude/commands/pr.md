@@ -12,7 +12,9 @@ Create a pull request following project conventions.
    pdm run lint
    pdm run test
    ```
-   Fix any issues before proceeding.
+   - If lint fails, run `pdm run format` and re-check. If issues persist after formatting, fix them manually.
+   - If tests fail, analyze and fix the failures before proceeding.
+   - If failures cannot be resolved, **stop** and report the specific errors to the user. Do NOT create a PR with failing checks.
 
 2. **Get branch and issue info**:
    ```bash
@@ -20,8 +22,11 @@ Create a pull request following project conventions.
    git log main..HEAD --oneline
    git diff main...HEAD --stat
    ```
+   - If on `main`, **stop**: "You are on main. Create a feature branch first using `/start-work`."
+   - If there are no commits ahead of main, **stop**: "No changes to create a PR for."
 
-3. **Extract issue number** from branch name (e.g., `feat/42-description` → `42`)
+3. **Extract issue number** from branch name (e.g., `feat/42-description` → `42`):
+   - If no issue number can be extracted, ask the user which issue this PR addresses.
 
 4. **Determine PR type** from branch prefix:
    | Branch Prefix | PR Type |
@@ -30,6 +35,8 @@ Create a pull request following project conventions.
    | `fix/` | `FIX` |
    | `refactor/` | `REFACTOR` |
    | `arch/` | `ARCH` |
+
+   If the branch prefix doesn't match, ask the user which type to use.
 
 5. **Push branch** if not already pushed:
    ```bash
