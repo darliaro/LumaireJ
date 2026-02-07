@@ -2,7 +2,7 @@ from datetime import UTC, datetime
 
 from sqlmodel import Field, SQLModel
 
-from app.constants import CONTENT_MAX_LENGTH, CONTENT_MIN_LENGTH
+from app.constants import CONTENT_MAX_LENGTH, CONTENT_MIN_LENGTH, MOOD_MAX_LENGTH
 
 
 class JournalEntry(SQLModel, table=True):
@@ -22,4 +22,6 @@ class JournalEntry(SQLModel, table=True):
         default=None,
         description="Timestamp of last modification in UTC",
     )
-    mood: str | None = Field(default=None, description="Optional mood tag")
+    mood: str | None = Field(
+        default=None, max_length=MOOD_MAX_LENGTH, description="Optional mood tag"
+    )

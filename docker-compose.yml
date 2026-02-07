@@ -17,8 +17,19 @@ services:
 
     # Mount source code and cache as volumes
     volumes:
-      - ./app:/app/app:delegated  # mount app code for live reload
+      - ./app:/app/app:ro,delegated  # mount app code read-only for security
       - pdm_cache:/app/__pypackages__  # cache PDM packages
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 # Named volume for PDM cache
 volumes:
