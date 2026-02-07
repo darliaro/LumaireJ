@@ -19,9 +19,12 @@ def update_journal_entry(
     session: Session, entry: JournalEntry, data: JournalUpdate
 ) -> JournalEntry:
     """Update an existing journal entry and set updated_at timestamp."""
+    # Explicit whitelist of updatable fields for security
+    updatable_fields = {"content", "mood"}
     update_data = data.model_dump(exclude_unset=True)
     for field, value in update_data.items():
-        setattr(entry, field, value)
+        if field in updatable_fields:
+            setattr(entry, field, value)
     entry.updated_at = datetime.now(UTC)
     session.add(entry)
     session.commit()

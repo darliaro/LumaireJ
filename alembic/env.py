@@ -1,26 +1,20 @@
-import os
 from logging.config import fileConfig
 
-from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
+from sqlalchemy.exc import OperationalError
 from sqlmodel import SQLModel
 
 import app.models  # noqa: F401
 from alembic import context
+from app.core.config import settings
 
 target_metadata = SQLModel.metadata
-
-load_dotenv()
 
 # Access Alembic configuration
 config = context.config
 
-# Get database URL from environment (prefer `database_url`, fallback to legacy `DATABASE_URL`)
-database_url = os.getenv("database_url") or os.getenv("DATABASE_URL")  # noqa: SIM112
-if not database_url:
-    raise RuntimeError(
-        "Set the database_url (or DATABASE_URL) environment variable before running Alembic"
-    )
+# Use centralized config instead of manual os.getenv
+database_url = settings.database_url
 # set the SQLAlchemy URL in Alembic config
 config.set_main_option("sqlalchemy.url", database_url)
 
@@ -37,6 +31,9 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        compare_type=True,
+        compare_server_default=True,
+        render_as_batch=True,
     )
     with context.begin_transaction():
         context.run_migrations()
@@ -50,10 +47,21 @@ def run_migrations_online() -> None:
         poolclass=pool.NullPool,
     )
     # Connect and run migrations
-    with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
-        with context.begin_transaction():
-            context.run_migrations()
+    try:
+        with connectable.connect() as connection:
+            context.configure(
+                connection=connection,
+                target_metadata=target_metadata,
+                compare_type=True,
+                compare_server_default=True,
+                render_as_batch=True,
+            )
+            with context.begin_transaction():
+                context.run_migrations()
+    except OperationalError as exc:
+        raise RuntimeError(
+            f"Cannot connect to database. Check DATABASE_URL: {type(exc).__name__}"
+        ) from exc
 
 
 # Choose offline or online based on execution context

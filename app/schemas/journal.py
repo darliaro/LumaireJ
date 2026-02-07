@@ -1,33 +1,57 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field, PositiveInt, constr
+from pydantic import BaseModel, ConfigDict, Field, PositiveInt, field_validator
 
 from app.constants import CONTENT_MAX_LENGTH, CONTENT_MIN_LENGTH, MOOD_MAX_LENGTH
 
 
 class JournalCreate(BaseModel):
-    content: constr(min_length=CONTENT_MIN_LENGTH, max_length=CONTENT_MAX_LENGTH) = Field(
+    content: str = Field(
         ...,
+        min_length=CONTENT_MIN_LENGTH,
+        max_length=CONTENT_MAX_LENGTH,
         description="Main textual content",
         json_schema_extra={"examples": ["Today I felt surprisingly calm and reflective"]},
     )
-    mood: constr(max_length=MOOD_MAX_LENGTH) | None = Field(
+    mood: str | None = Field(
         default=None,
+        min_length=1,  # Prevent empty strings
+        max_length=MOOD_MAX_LENGTH,
         description="Mood tag",
     )
+
+    @field_validator("mood", mode="before")
+    @classmethod
+    def convert_empty_mood_to_none(cls, v: str | None) -> str | None:
+        """Convert empty or whitespace-only mood strings to None."""
+        if v is not None and not v.strip():
+            return None
+        return v
 
     model_config = ConfigDict(str_strip_whitespace=True)
 
 
 class JournalUpdate(BaseModel):
-    content: constr(min_length=CONTENT_MIN_LENGTH, max_length=CONTENT_MAX_LENGTH) | None = Field(
+    content: str | None = Field(
         default=None,
+        min_length=CONTENT_MIN_LENGTH,
+        max_length=CONTENT_MAX_LENGTH,
         description="Main textual content",
     )
-    mood: constr(max_length=MOOD_MAX_LENGTH) | None = Field(
+    mood: str | None = Field(
         default=None,
+        min_length=1,  # Prevent empty strings
+        max_length=MOOD_MAX_LENGTH,
         description="Mood tag",
     )
+
+    @field_validator("mood", mode="before")
+    @classmethod
+    def convert_empty_mood_to_none(cls, v: str | None) -> str | None:
+        """Convert empty or whitespace-only mood strings to None."""
+        if v is not None and not v.strip():
+            return None
+        return v
 
     model_config = ConfigDict(str_strip_whitespace=True)
 

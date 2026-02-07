@@ -8,6 +8,8 @@ on:
   pull_request_review:
     types: [submitted]
 
+permissions: {}
+
 env:
   PROJECT_ID: PVT_kwHODR8J4s4A9wbx
   STATUS_FIELD_ID: PVTSSF_lAHODR8J4s4A9wbxzgxXTgM
@@ -24,6 +26,8 @@ jobs:
   issue-opened:
     if: github.event_name == 'issues' && github.event.action == 'opened'
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    timeout-minutes: 5
     steps:
       - name: Add issue to project
         env:
@@ -47,6 +51,7 @@ jobs:
   issue-closed:
     if: github.event_name == 'issues' && github.event.action == 'closed'
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Get project item ID
         id: get-item
@@ -81,6 +86,7 @@ jobs:
   pr-opened:
     if: github.event_name == 'pull_request' && github.event.action == 'opened'
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Add PR to project and set AI Review
         env:
@@ -104,6 +110,7 @@ jobs:
   pr-merged:
     if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Get project item ID
         id: get-item
@@ -138,6 +145,7 @@ jobs:
   pr-review:
     if: github.event_name == 'pull_request_review'
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Get project item ID
         id: get-item
