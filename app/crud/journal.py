@@ -1,9 +1,25 @@
 from datetime import UTC, datetime
 
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 from app.models.journal import JournalEntry
 from app.schemas.journal import JournalCreate, JournalUpdate
+
+
+def get_journal_entry(session: Session, entry_id: int) -> JournalEntry | None:
+    """Retrieve a single journal entry by ID."""
+    return session.get(JournalEntry, entry_id)
+
+
+def get_journal_entries(session: Session, skip: int = 0, limit: int = 20) -> list[JournalEntry]:
+    """Retrieve a paginated list of journal entries."""
+    return list(session.exec(select(JournalEntry).offset(skip).limit(limit)).all())
+
+
+def delete_journal_entry(session: Session, entry: JournalEntry) -> None:
+    """Delete a journal entry."""
+    session.delete(entry)
+    session.commit()
 
 
 def create_journal_entry(session: Session, data: JournalCreate) -> JournalEntry:
