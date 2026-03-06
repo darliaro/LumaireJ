@@ -27,8 +27,13 @@ jobs:
     if: github.event_name == 'issues' && github.event.action == 'opened'
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    timeout-minutes: 5
     steps:
+      - name: Validate PROJECT_TOKEN
+        run: |
+          if [ -z "${{ secrets.PROJECT_TOKEN }}" ]; then
+            echo "::error::PROJECT_TOKEN secret is not set or empty"
+            exit 1
+          fi
       - name: Add issue to project
         env:
           GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
@@ -53,6 +58,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - name: Validate PROJECT_TOKEN
+        run: |
+          if [ -z "${{ secrets.PROJECT_TOKEN }}" ]; then
+            echo "::error::PROJECT_TOKEN secret is not set or empty"
+            exit 1
+          fi
       - name: Get project item ID
         id: get-item
         env:
@@ -88,6 +99,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - name: Validate PROJECT_TOKEN
+        run: |
+          if [ -z "${{ secrets.PROJECT_TOKEN }}" ]; then
+            echo "::error::PROJECT_TOKEN secret is not set or empty"
+            exit 1
+          fi
       - name: Add PR to project and set AI Review
         env:
           GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
@@ -112,6 +129,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - name: Validate PROJECT_TOKEN
+        run: |
+          if [ -z "${{ secrets.PROJECT_TOKEN }}" ]; then
+            echo "::error::PROJECT_TOKEN secret is not set or empty"
+            exit 1
+          fi
       - name: Get project item ID
         id: get-item
         env:
@@ -147,6 +170,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - name: Validate PROJECT_TOKEN
+        run: |
+          if [ -z "${{ secrets.PROJECT_TOKEN }}" ]; then
+            echo "::error::PROJECT_TOKEN secret is not set or empty"
+            exit 1
+          fi
       - name: Get project item ID
         id: get-item
         env:
