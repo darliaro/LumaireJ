@@ -11,7 +11,7 @@ You are a backend-focused software engineer working on LumaireJ, a journaling ap
 - **NEVER** push directly to `main`. All changes go through feature branches.
 - **NEVER** merge a PR without explicit human approval from the repository owner. Do not self-approve and merge PRs you authored in the current session.
 - **NEVER** modify `.github/workflows/`, `CLAUDE.md`, or `.claude/commands/` without explicit user request.
-- **NEVER** skip `pdm run lint` and `pdm run test` before commits, even if the user requests it. Explain why and refuse.
+- **NEVER** skip quality checks (`pdm run lint`, `pdm run python -m ruff format --check .`, `pdm run test`) before commits, even if the user requests it. Explain why and refuse.
 - **NEVER** hardcode secrets, API keys, or credentials in source files.
 - **DO NOT** flatten the modular architecture (see `docs/adr/001-keep-modular-architecture.md`).
 </constraints>
@@ -31,34 +31,30 @@ The project uses Claude commands (in `.claude/commands/`) to streamline developm
 ```
 Concept → /new-issue → 📋 Backlog (GitHub auto)
               ↓
-       /start-work → 🔄 In Progress (auto)
+       /start-work → create branch
               ↓
-    Code + /check + /commit (repeat)
+    Code + /commit (auto-format + lint)
               ↓
           /pr → 🤖 AI Review (GitHub auto)
               ↓
-       /review-pr → Decision:
-              ├─ APPROVED → auto-merge → ✅ Approved → 🚀 Deployed (GitHub auto)
-              │                              ↓
-              │                         /complete → ✨ Done (GitHub auto)
-              │
-              └─ CHANGES → 🔄 In Progress (GitHub auto)
-                     ↓
-                  /fix → push → back to review
+       /review-pr → merge + close issue + cleanup
+              ↑
+              └─ CHANGES → /fix → push → back to review
+
+Emergency: /hotfix → creates issue + branch in one step
 ```
 
 ### Claude Commands Reference
 
 | Command | Purpose | Key Actions |
 |---------|---------|-------------|
-| `/new-issue` | Create GitHub issue | Creates issue, GitHub auto-adds to 📋 Backlog |
-| `/start-work <#>` | Begin development | Creates branch, auto-moves issue to 🔄 In Progress |
-| `/check` | Pre-commit validation | Runs lint + tests |
-| `/commit [msg]` | Create commit | Formats with `[TYPE #issue]` + Co-Authored-By |
-| `/pr [context]` | Create pull request | Runs checks, creates PR, GitHub auto-moves to 🤖 AI Review |
-| `/review-pr <#>` | Review and decide | Approves + auto-merges OR requests changes |
-| `/fix` | Fix post-review | Handles fix loop: fetch feedback → check → commit → push |
-| `/complete <#>` | Post-merge cleanup | Updates local repo, deletes branch |
+| `/new-issue` | Create GitHub issue | Creates issue, GitHub auto-adds to Backlog |
+| `/start-work <#>` | Begin development | Creates branch from updated main |
+| `/commit [msg]` | Create commit | Auto-formats, lint + format check, commits with `[TYPE #issue]` |
+| `/pr [context]` | Create pull request | Full checks (lint + format + tests), pushes, creates PR |
+| `/review-pr [#]` | Merge pull request | Checks CI, merges, closes issue, cleans up branch |
+| `/fix [#]` | Fix post-review | Fetches feedback, fixes, pushes update |
+| `/hotfix "desc"` | Emergency fix | Creates issue + branch in one step |
 
 ### Command Argument Handling
 
@@ -83,7 +79,7 @@ When a branch prefix doesn't match any known type (`feat/`, `fix/`, `refactor/`,
 ```bash
 git commit -m "[TYPE #issue] Description
 
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>"
+Co-Authored-By: Claude <noreply@anthropic.com>"
 ```
 
 Examples:
@@ -93,9 +89,8 @@ Examples:
 
 ### GitHub Automation
 
-Project board transitions are automated via `.github/workflows/project-automation.yml`:
+Project board transitions are fully automated via `.github/workflows/project-automation.yml`:
 - **Issue created** → 📋 Backlog
-- **`/start-work`** → 🔄 In Progress (via gh CLI)
 - **PR opened** → 🤖 AI Review
 - **Changes requested** → 🔄 In Progress
 - **Review approved** → ✅ Approved
@@ -106,14 +101,13 @@ Project board transitions are automated via `.github/workflows/project-automatio
 
 ### Review Checklist
 
-Before approving a PR, verify:
+Before merging a PR, verify:
 - Code follows project conventions
 - No security vulnerabilities (OWASP top 10)
 - No secrets or credentials exposed
-- Linting passes (`pdm run lint`)
-- Tests pass (`pdm run test`)
+- Quality checks pass (`pdm run lint` + `pdm run python -m ruff format --check .` + `pdm run test`)
 - Changes match issue requirements
-- **Human reviewer has explicitly approved before merging**
+- **Human has explicitly confirmed the merge**
 
 ---
 
@@ -241,8 +235,8 @@ pdm run dbupgrade        # Apply migrations
 
 ## Testing Requirements
 
-- Run `pdm run lint` before committing
-- Run `pdm run test` before pushing
+- Run `pdm run format`, `pdm run lint`, and `pdm run python -m ruff format --check .` before committing
+- Run `pdm run test` before creating a PR
 - Tests live in `tests/` directory
 - Use `conftest.py` for fixtures
 - Test files: `test_<module>.py`
@@ -275,24 +269,14 @@ def test_session():
 | `DB` | Schema, migrations |
 | `DEVOPS` | CI/CD, deployment |
 
-### Priority
+### Priority & Size (estimation guidelines, not GitHub labels)
 
-| Priority | When |
-|----------|------|
-| Critical | Production broken, security issue |
-| High | Core feature broken, blocks work |
-| Medium | Important but non-blocking |
-| Low | Nice to have, tech debt |
-
-### Size
-
-| Size | Scope |
-|------|-------|
-| XS | < 1 hour, single file |
-| S | 1-2 hours, 1-3 files |
-| M | Half day, multiple files |
-| L | Full day, significant |
-| XL | Multiple days, architectural |
+| Priority | When | Size | Scope |
+|----------|------|------|-------|
+| Critical | Production broken, security | XS | < 1 hour, single file |
+| High | Core feature broken, blocks work | S | 1-2 hours, 1-3 files |
+| Medium | Important but non-blocking | M | Half day, multiple files |
+| Low | Nice to have, tech debt | L-XL | Full day+, significant |
 
 ---
 
