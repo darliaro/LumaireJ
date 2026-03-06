@@ -55,7 +55,9 @@ def test_get_journal_entries_pagination(test_session: Session):
 
 def test_update_journal_entry(test_session: Session):
     entry = create_journal_entry(test_session, JournalCreate(content="Original"))
-    updated = update_journal_entry(test_session, entry, JournalUpdate(content="Updated", mood="happy"))
+    updated = update_journal_entry(
+        test_session, entry, JournalUpdate(content="Updated", mood="happy")
+    )
     assert updated.content == "Updated"
     assert updated.mood == "happy"
     assert updated.updated_at is not None
