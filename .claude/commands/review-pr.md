@@ -1,9 +1,18 @@
-# Review Pull Request
+# Review & Merge Pull Request
 
-Review a pull request following project conventions.
+Check CI, review changes, merge, and clean up. Designed for solo-developer workflow.
 
 ## Arguments
-- `$ARGUMENTS` - PR number or URL
+- `$ARGUMENTS` - PR number (optional -- inferred from current branch if omitted)
+
+<validation>
+If `$ARGUMENTS` is empty:
+1. Infer PR from the current branch:
+   ```bash
+   gh pr list --head "$(git branch --show-current)" --json number --jq '.[0].number'
+   ```
+2. If no PR found, ask the user: "Which PR number should I review?"
+</validation>
 
 ## Instructions
 
@@ -11,53 +20,45 @@ Review a pull request following project conventions.
    ```bash
    gh pr view <pr-number>
    gh pr diff <pr-number>
+   ```
+
+2. **Check CI status**:
+   ```bash
    gh pr checks <pr-number>
    ```
+   - If checks are still running, wait: `gh pr checks <pr-number> --watch`
+   - If checks failed, report the failures and guide user to `/fix`. Do NOT merge.
 
-2. **Review checklist** (from CLAUDE.md):
-   - [ ] Code follows project conventions
-   - [ ] No security vulnerabilities (OWASP top 10)
+3. **Quick review** -- verify:
    - [ ] No secrets or credentials exposed
-   - [ ] Linting passes
-   - [ ] Tests pass
-   - [ ] Changes match issue requirements
+   - [ ] No obvious security issues
+   - [ ] Changes match the linked issue requirements
 
-3. **Check related issue**:
+4. **Present findings** and ask: "PR #X passes all checks. Merge?"
+
+   **Do NOT merge without the user's explicit confirmation.**
+
+5. **On confirmation -- merge**:
    ```bash
-   gh issue view <linked-issue-number>
+   gh pr merge <pr-number> --squash --delete-branch
+   ```
+   If merge is blocked by branch protection while checks are green, inform the user and suggest `--admin`.
+
+6. **Close the linked issue** (squash merges may not trigger auto-close):
+   Extract issue number from the PR branch name or body, then:
+   ```bash
+   gh issue close <issue-number>
    ```
 
-4. **Analyze the changes**:
-   - Read modified files
-   - Check for code quality issues
-   - Verify tests cover new functionality
-   - Look for potential bugs
+7. **Local cleanup**:
+   ```bash
+   git checkout main
+   git pull origin main
+   git branch -d <branch-name> 2>/dev/null || true
+   git remote prune origin
+   ```
 
-5. **Make decision** based on review:
+8. **Confirm**: "Merged, issue closed, cleaned up. Ready for next issue."
 
-   **If APPROVED:**
-   - **STOP: Do NOT merge without human confirmation.** Present findings to the user and ask:
-     "PR #X passes all review checks. Approve and merge?"
-   - Only after the user explicitly confirms, submit approval:
-     ```bash
-     gh pr review <pr-number> --approve --body "LGTM - changes look good"
-     ```
-   - Then merge the PR:
-     ```bash
-     gh pr merge <pr-number> --squash --delete-branch
-     ```
-     Note: GitHub automation will move PR to ✅ Approved → 🚀 Deployed
-   - Automatically trigger cleanup by running `/complete-issue <issue-number>`
-
-   **If CHANGES NEEDED:**
-   - Submit review with specific feedback:
-     ```bash
-     gh pr review <pr-number> --request-changes --body "Please address:
-     - Issue 1
-     - Issue 2"
-     ```
-     Note: GitHub automation will move PR to 🔄 In Progress
-   - Guide user to use `/fix` command to address the requested changes
-
-## PR to Review
+## PR Number
 $ARGUMENTS

@@ -1,6 +1,6 @@
 # Fix Post-Review Changes
 
-Handle requested changes after PR review.
+Fetch review feedback, implement fixes, and push updates.
 
 ## Arguments
 - `$ARGUMENTS` - (Optional) PR number or additional context
@@ -15,51 +15,45 @@ Handle requested changes after PR review.
      ```
    - If no PR can be found, ask the user for the PR number.
 
-2. **Fetch latest review feedback**:
+2. **Fetch all review feedback** (summary, comments, and inline reviews):
    ```bash
    gh pr view <pr-number>
+   gh pr view <pr-number> --comments
    gh pr checks <pr-number>
    ```
 
-3. **Display requested changes** from the review to user clearly.
+3. **Display requested changes** clearly to the user.
 
-4. **Implement the fixes**:
-   - Analyze the review feedback and identify required code changes
-   - Make the code changes directly to address each piece of feedback
-   - If a feedback item is ambiguous or requires a design decision, ask the user for clarification before proceeding
+4. **Implement fixes**:
+   - Analyze the review feedback and make code changes directly.
+   - If a feedback item is ambiguous, ask the user before proceeding.
 
-5. **Run quality checks**:
+5. **Auto-format and run quality checks** (must match CI):
    ```bash
+   pdm run format
    pdm run lint
+   pdm run python -m ruff format --check .
    pdm run test
    ```
-   - If lint fails, run `pdm run format` and re-check. If issues persist, fix them manually.
-   - If tests fail, analyze and fix. If failures are unrelated to the review changes, inform the user.
-   - Do NOT push if quality checks fail.
+   - If checks fail, fix before pushing. Do NOT push failing code.
 
-6. **Create fix commit**:
-   - Extract issue number from branch
-   - Determine commit type from branch prefix
-   - Create commit with descriptive message:
-     ```bash
-     git add <changed-files>
-     git commit -m "[TYPE #issue] Fix: Address review feedback
+6. **Commit fixes**:
+   - Extract issue number from branch name.
+   - Determine commit type from branch prefix.
+   ```bash
+   git add <changed-files>
+   git commit -m "[TYPE #issue] Address review feedback
 
-     Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>"
-     ```
+   Co-Authored-By: Claude <noreply@anthropic.com>"
+   ```
 
-7. **Push changes**:
+7. **Push and notify**:
    ```bash
    git push
-   ```
-   Note: This automatically updates the PR. GitHub automation keeps PR in 🔄 In Progress.
-
-8. **Notify reviewer** (optional):
-   ```bash
-   gh pr comment <pr-number> --body "Changes addressed and pushed. Ready for re-review."
+   gh pr comment <pr-number> --body "Review feedback addressed. Ready for re-review."
    ```
 
-9. **Report** to user: "Changes pushed successfully. PR updated and ready for re-review."
+8. **Report**: "Changes pushed. PR updated and ready for re-review."
 
 ## PR or Context
 $ARGUMENTS

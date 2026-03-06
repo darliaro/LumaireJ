@@ -5,30 +5,38 @@ Create a new GitHub issue following project conventions.
 ## Arguments
 - `$ARGUMENTS` - Issue description or title
 
+<validation>
+If `$ARGUMENTS` is empty, ask the user: "What should the issue be about?"
+Do NOT proceed without a description.
+</validation>
+
 ## Instructions
 
 1. **Determine issue type** by analyzing the request:
-   - `[FEAT]` - New functionality
-   - `[FIX]` - Bug or defect
-   - `[REFACTOR]` - Code improvement (no behavior change)
-   - `[ARCH]` - Infrastructure/architecture changes
+   | Keyword Pattern | Type |
+   |----------------|------|
+   | New functionality, add, implement | `[FEAT]` |
+   | Bug, broken, error, crash, fix | `[FIX]` |
+   | Refactor, clean up, restructure | `[REFACTOR]` |
+   | Infrastructure, CI, config, architecture | `[ARCH]` |
 
-2. **Select appropriate labels** from:
-   - Type: `bug`, `feature`, `improvement`, `refactor`
-   - Area: `BACKEND`, `FRONTEND`, `CONFIG`, `TEST`, `DB`, `DEVOPS`
-   - Priority: `Critical`, `High`, `Medium`, `Low`
-   - Size: `XS`, `S`, `M`, `L`, `XL`
+   If ambiguous, ask the user which type to use. Do NOT guess.
 
-3. **Create the issue** with proper formatting:
+2. **Select labels** — verify available labels first:
+   ```bash
+   gh label list --json name --jq '.[].name'
+   ```
+   Only use labels that appear in the output. Do NOT invent or assume labels exist.
+
+3. **Create the issue**:
    ```bash
    gh issue create --title "[TYPE] Description" \
-     --body "Description and acceptance criteria" \
+     --body "issue body" \
      --label "labels" \
-     --assignee darliaro
+     --assignee dariero
    ```
-   Note: GitHub automation will automatically add the issue to the 📋 Backlog column.
 
-4. **Report the issue number and URL** to the user.
+4. **Report** the issue number and URL.
 
 ## User Request
 $ARGUMENTS
